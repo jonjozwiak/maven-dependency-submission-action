@@ -85,10 +85,11 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   //}
   let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
   //core.debug(`Dependencies ${pkg.dependencies}`)
-  core.debug(`Dependencies ${pkg.depPackage.dependencies}`)
+  core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`)
   //if (Array.isArray(pkg.dependencies)) {
   for (const dependencyUrl of pkg.depPackage.dependencies) {
-    console.log(dependencyUrl);
+    //console.log(dependencyUrl);
+    core.debug(`Dependency URL - ${dependencyUrl}`)
     tree += buildTree(snapshot, dependencyUrl, indent + 2);
   }
   //}
