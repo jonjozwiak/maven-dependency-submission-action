@@ -90,7 +90,10 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   for (const dependencyUrl of pkg.depPackage.dependencies) {
     //console.log(dependencyUrl);
     core.debug(`Dependency URL - ${dependencyUrl}`)
-    core.debug(`Dependency URL - ${dependencyUrl.PackageURL}`)
+    core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
+    core.debug(`Dependency PackageURL - ${dependencyUrl.PackageURL}`)
+    core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`)
+    
     tree += buildTree(snapshot, dependencyUrl, indent + 2);
   }
   //}
