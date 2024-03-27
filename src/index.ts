@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as core from '@actions/core';
-import {Snapshot, submitSnapshot} from '@github/dependency-submission-toolkit';
+import { Snapshot, submitSnapshot} from '@github/dependency-submission-toolkit';
 import { SnapshotConfig, generateSnapshot } from './snapshot-generator';
 
 async function run() {
@@ -42,6 +42,19 @@ async function run() {
       //core.debug(`Out Relationiship - ${pkg.relationship}`)
       //core.debug(`Out Scope - ${pkg.scope}`)
       //core.debug(`Out Dependencies - ${pkg.dependencies}`)
+      for (const dependencyUrl of pkg.depPackage.dependencies) {
+        console.log(dependencyUrl);
+        core.debug(`Dependency URL - ${dependencyUrl}`)
+        core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
+        core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
+        core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
+        //core.debug(`Dep Qualifiers - ${dependencyUrl.qualifiers}`)
+        //core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.qualifiers, null, 2)}`)
+        //core.debug(`Dep Qualifiers type - ${dependencyUrl.qualifiers.type}`)
+        //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
+      }
+
+
       if (pkg.relationship === 'direct') {
         tree += buildTree(snapshot, packageUrl, 0);
       }
