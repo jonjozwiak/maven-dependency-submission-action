@@ -32940,6 +32940,8 @@ function buildTree(snapshot, packageUrl, indent) {
         core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`);
         core.debug(`Dep Qualifiers - ${dependencyUrl.qualifiers}`);
         core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.qualifiers, null, 2)}`);
+        core.debug(`Dep Qualifiers type - ${dependencyUrl.qualifiers.type}`);
+        core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`);
         //const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
         //core.debug(`My Dep - ${myDep}`)
         tree += buildTree(snapshot, dependencyUrl, indent + 2);
