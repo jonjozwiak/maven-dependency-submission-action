@@ -32882,7 +32882,11 @@ function run() {
             for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
                 const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
                 core.debug(`Out of buildTree - ${packageUrl}`);
-                core.debug(`Package - ${JSON.stringify(pkg, null, 2)}`);
+                core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`);
+                core.debug(`Out Package URL - ${pkg.package_url}`);
+                core.debug(`Out Relationiship - ${pkg.relationship}`);
+                core.debug(`Out Scope - ${pkg.scope}`);
+                core.debug(`Out Dependencies - ${pkg.dependencies}`);
                 if (pkg.relationship === 'direct') {
                     tree += buildTree(snapshot, packageUrl, 0);
                 }
@@ -32904,6 +32908,9 @@ function buildTree(snapshot, packageUrl, indent) {
     core.debug(`Building tree for ${packageUrl}`);
     const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
     core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`);
+    console.log(`Package URL before check: ${pkg.package_url}`);
+    console.log(pkg);
+    console.log(pkg.package_url);
     //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
     if (!pkg) {
         core.debug(`Package not found ${packageUrl}`);
