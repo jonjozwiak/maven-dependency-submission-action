@@ -99,8 +99,10 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
     core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
     core.debug(`Dependency PackageURL - ${dependencyUrl.PackageURL}`)
     core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`)
-    const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
-    core.debug(`My Dep - ${myDep}`)
+    core.debug(`Dep Qualifiers - ${dependencyUrl.qualifiers}`)
+    core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.qualifiers, null, 2)}`)
+    //const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
+    //core.debug(`My Dep - ${myDep}`)
 
     tree += buildTree(snapshot, dependencyUrl, indent + 2);
   }
