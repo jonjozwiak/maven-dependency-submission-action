@@ -69,7 +69,7 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
   //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
   //console.log(`Package URL before check: ${pkg.package_url}`);
-  //console.log(pkg);
+  console.log(pkg);
   //console.log(pkg.package_url);
 
   //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
@@ -93,7 +93,7 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
     core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
     core.debug(`Dependency PackageURL - ${dependencyUrl.PackageURL}`)
     core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`)
-    
+
     tree += buildTree(snapshot, dependencyUrl, indent + 2);
   }
   //}
