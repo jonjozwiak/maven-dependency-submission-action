@@ -32878,8 +32878,11 @@ function run() {
             external_fs_.writeFileSync('dependencySnapshot.json', JSON.stringify(snapshot));
             // Write dependency tree as output
             let tree = '';
+            // TODO - Remove hardcoded manifest name
             for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
                 const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+                core.debug(`Out of buildTree - ${packageUrl}`);
+                core.debug(`Package - ${JSON.stringify(pkg, null, 2)}`);
                 if (pkg.relationship === 'direct') {
                     tree += buildTree(snapshot, packageUrl, 0);
                 }
@@ -32900,6 +32903,7 @@ function run() {
 function buildTree(snapshot, packageUrl, indent) {
     core.debug(`Building tree for ${packageUrl}`);
     const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+    core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
     if (!pkg) {
         core.debug(`Package not found ${packageUrl}`);
         return '';
