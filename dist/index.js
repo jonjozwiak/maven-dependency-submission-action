@@ -32893,9 +32893,9 @@ function run() {
                     core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`);
                     core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`);
                     core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`);
-                    //core.debug(`Dep Qualifiers - ${dependencyUrl.qualifiers}`)
-                    //core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.qualifiers, null, 2)}`)
-                    //core.debug(`Dep Qualifiers type - ${dependencyUrl.qualifiers.type}`)
+                    core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`);
+                    core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`);
+                    //core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`)
                     //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
                 }
                 if (pkg.relationship === 'direct') {
