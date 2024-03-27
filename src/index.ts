@@ -60,9 +60,15 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   core.debug(`Building tree for ${packageUrl}`)
   const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
   if (!pkg) {
+    core.debug(`Package not found ${packageUrl}`)
+    return '';
+  }
+  if (!pkg.package_url) {
+    core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
     return '';
   }
   let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.package_url + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
+  core.debug(`Dependencies ${pkg.dependencies}`)
   if (Array.isArray(pkg.dependencies)) {
     for (const dependencyUrl of pkg.dependencies) {
       tree += buildTree(snapshot, dependencyUrl, indent + 2);
