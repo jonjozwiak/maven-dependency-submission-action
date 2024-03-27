@@ -32326,6 +32326,8 @@ var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
 
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/packageurl-js/index.js
@@ -32348,8 +32350,6 @@ ${JSON.stringify(n.response.data,void 0,2)}`)),n instanceof Error&&(core.error(n
 //# sourceMappingURL=index.js.map
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(1017);
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
 ;// CONCATENATED MODULE: ./lib/src/utils/file-utils.js
 
 function loadFileContents(file) {
@@ -32850,6 +32850,7 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
+
 function run() {
     return src_awaiter(this, void 0, void 0, function* () {
         let snapshot;
@@ -32873,6 +32874,19 @@ function run() {
             core.setFailed(`Failed to generate a dependency snapshot, check logs for more details, ${err}`);
         }
         if (snapshot) {
+            // Write snapshot to a file
+            external_fs_.writeFileSync('dependencySnapshot.json', JSON.stringify(snapshot));
+            // Write dependency tree as output
+            let tree = '';
+            for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
+                const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+                if (pkg.relationship === 'direct') {
+                    tree += buildTree(snapshot, packageUrl, 0);
+                }
+            }
+            core.info(tree);
+            yield core.summary;
+            core.summary.addHeading(`Dependencies`);
             core.startGroup(`Dependency Snapshot`);
             core.info(snapshot.prettyJSON());
             core.endGroup();
@@ -32881,6 +32895,15 @@ function run() {
             core.info(`completed.`);
         }
     });
+}
+// Note - this should be moved to a separate file
+function buildTree(snapshot, packageUrl, indent) {
+    const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+    let tree = ' '.repeat(indent) + pkg.package_url.split('/')[2] + ' (' + pkg.relationship + ', ' + pkg.scope + ')\n';
+    for (const dependencyUrl of pkg.dependencies) {
+        tree += buildTree(snapshot, dependencyUrl, indent + 2);
+    }
+    return tree;
 }
 run();
 //# sourceMappingURL=index.js.map
