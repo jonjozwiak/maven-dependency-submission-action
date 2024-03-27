@@ -71,6 +71,9 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   console.log(`Package URL before check: ${pkg.package_url}`);
   console.log(pkg);
   console.log(pkg.package_url);
+
+  console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
+  console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
   //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
   if (!pkg) {
     core.debug(`Package not found ${packageUrl}`)
