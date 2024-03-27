@@ -142,9 +142,9 @@ function buildTree(snapshot: any, pkg, indent: number): string {
     console.log(dependencyUrl);
     core.debug(`Dependency URL - ${dependencyUrl}`)
     core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
-    core.debug(`Dependency PackageURL - ${dependencyUrl.PackageURL}`)
-    core.debug(`Dependency PackageURL tostring - ${dependencyUrl.PackageURL.toString()}`)
-    core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`)
+    core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
+    core.debug(`Dependency PackageURL tostring - ${dependencyUrl.packageURL.toString()}`)
+    core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
     core.debug(`Dep Qualifiers - ${dependencyUrl.qualifiers}`)
     core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.qualifiers, null, 2)}`)
     core.debug(`Dep Qualifiers type - ${dependencyUrl.qualifiers.type}`)
