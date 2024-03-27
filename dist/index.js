@@ -32949,7 +32949,7 @@ function buildTree(snapshot, pkg, indent) {
     //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
     //  return '';
     //}
-    let tree = ' '.repeat(indent) + pkg.packageUrl + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
+    let tree = ' '.repeat(indent) + pkg.depPackage.packageURL + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
     //core.debug(`Dependencies ${pkg.dependencies}`)
     core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`);
     //if (Array.isArray(pkg.dependencies)) {
