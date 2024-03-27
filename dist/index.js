@@ -32883,10 +32883,10 @@ function run() {
                 const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
                 core.debug(`Out of buildTree - ${packageUrl}`);
                 core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`);
-                core.debug(`Out Package URL - ${pkg.package_url}`);
+                //core.debug(`Out Package URL - ${pkg.package_url}`)
                 core.debug(`Out Relationiship - ${pkg.relationship}`);
                 core.debug(`Out Scope - ${pkg.scope}`);
-                core.debug(`Out Dependencies - ${pkg.dependencies}`);
+                //core.debug(`Out Dependencies - ${pkg.dependencies}`)
                 if (pkg.relationship === 'direct') {
                     tree += buildTree(snapshot, packageUrl, 0);
                 }
@@ -32922,13 +32922,14 @@ function buildTree(snapshot, packageUrl, indent) {
         core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`);
         return '';
     }
-    let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.package_url + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
+    let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
     core.debug(`Dependencies ${pkg.dependencies}`);
-    if (Array.isArray(pkg.dependencies)) {
-        for (const dependencyUrl of pkg.dependencies) {
-            tree += buildTree(snapshot, dependencyUrl, indent + 2);
-        }
+    //if (Array.isArray(pkg.dependencies)) {
+    for (const dependencyUrl of pkg.depPackage.dependencies) {
+        console.log(dependencyUrl);
+        tree += buildTree(snapshot, dependencyUrl, indent + 2);
     }
+    //}
     return tree;
 }
 run();
