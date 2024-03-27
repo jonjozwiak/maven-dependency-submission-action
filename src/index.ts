@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as core from '@actions/core';
 import {Snapshot, submitSnapshot} from '@github/dependency-submission-toolkit';
 import { SnapshotConfig, generateSnapshot } from './snapshot-generator';
@@ -26,6 +27,24 @@ async function run() {
   }
 
   if (snapshot) {
+    // Write snapshot to a file
+    fs.writeFileSync('dependencySnapshot.json', JSON.stringify(snapshot));
+
+    // Write dependency tree as output
+    let tree = '';
+    for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
+      const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+      if (pkg.relationship === 'direct') {
+        tree += buildTree(snapshot, packageUrl, 0);
+      }
+    }
+
+    core.info(tree);
+
+    await core.summary
+    core.summary.addHeading(`Dependencies`);
+
+
     core.startGroup(`Dependency Snapshot`);
     core.info(snapshot.prettyJSON())
     core.endGroup();
@@ -35,5 +54,16 @@ async function run() {
     core.info(`completed.`)
   }
 }
+
+// Note - this should be moved to a separate file
+function buildTree(snapshot: any, packageUrl: string, indent: number): string {
+  const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+  let tree = ' '.repeat(indent) + pkg.package_url.split('/')[2] + ' (' + pkg.relationship + ', ' + pkg.scope + ')\n';
+  for (const dependencyUrl of pkg.dependencies) {
+    tree += buildTree(snapshot, dependencyUrl, indent + 2);
+  }
+  return tree;
+}
+
 
 run();
