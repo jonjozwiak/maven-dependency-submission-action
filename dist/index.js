@@ -32898,13 +32898,16 @@ function run() {
 }
 // Note - this should be moved to a separate file
 function buildTree(snapshot, packageUrl, indent) {
+    core.debug(`Building tree for ${packageUrl}`);
     const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
     if (!pkg) {
         return '';
     }
     let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.package_url + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
-    for (const dependencyUrl of pkg.dependencies) {
-        tree += buildTree(snapshot, dependencyUrl, indent + 2);
+    if (Array.isArray(pkg.dependencies)) {
+        for (const dependencyUrl of pkg.dependencies) {
+            tree += buildTree(snapshot, dependencyUrl, indent + 2);
+        }
     }
     return tree;
 }
