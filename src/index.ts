@@ -78,9 +78,9 @@ async function run() {
 }
 
 // Note - this should be moved to a separate file
-function buildTree(snapshot: any, packageUrl, indent: number): string {
-  core.debug(`Building tree for ${packageUrl}`)
-  const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+function buildTree(snapshot: any, pkg, indent: number): string {
+  core.debug(`Building tree for ${pkg.packageUrl}`)
+  //const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
   //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
   //console.log(`Package URL before check: ${pkg.package_url}`);
   console.log(pkg);
@@ -89,15 +89,15 @@ function buildTree(snapshot: any, packageUrl, indent: number): string {
   //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
   //console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
   //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
-  if (!pkg) {
-    core.debug(`Package not found ${packageUrl}`)
-    return '';
-  }
+  //if (!pkg) {
+  //  core.debug(`Package not found ${packageUrl}`)
+  //  return '';
+  //}
   //if (!pkg.package_url) {
   //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
   //  return '';
   //}
-  let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
+  let tree = ' '.repeat(indent) + pkg.packageUrl + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
   //core.debug(`Dependencies ${pkg.dependencies}`)
   core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`)
   //if (Array.isArray(pkg.dependencies)) {
