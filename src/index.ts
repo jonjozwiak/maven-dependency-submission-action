@@ -63,7 +63,8 @@ async function run() {
 function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   core.debug(`Building tree for ${packageUrl}`)
   const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
-  core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
+  core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
+  //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
   if (!pkg) {
     core.debug(`Package not found ${packageUrl}`)
     return '';
