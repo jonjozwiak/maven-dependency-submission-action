@@ -32899,7 +32899,10 @@ function run() {
 // Note - this should be moved to a separate file
 function buildTree(snapshot, packageUrl, indent) {
     const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
-    let tree = ' '.repeat(indent) + pkg.package_url.split('/')[2] + ' (' + pkg.relationship + ', ' + pkg.scope + ')\n';
+    if (!pkg) {
+        return '';
+    }
+    let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.package_url + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
     for (const dependencyUrl of pkg.dependencies) {
         tree += buildTree(snapshot, dependencyUrl, indent + 2);
     }
