@@ -32851,6 +32851,21 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
+class Dependency {
+    constructor(depPackage, relationship, scope) {
+        this.depPackage = depPackage;
+        this.relationship = relationship;
+        this.scope = scope;
+    }
+    toJSON() {
+        return {
+            package_url: this.depPackage.packageURL.toString(),
+            relationship: this.relationship,
+            scope: this.scope,
+            dependencies: this.depPackage.packageDependencyIDs
+        };
+    }
+}
 function run() {
     return src_awaiter(this, void 0, void 0, function* () {
         let snapshot;
@@ -32949,6 +32964,7 @@ function buildTree(snapshot, pkg, indent) {
         core.debug(`Dependency URL - ${dependencyUrl}`);
         core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`);
         core.debug(`Dependency PackageURL - ${dependencyUrl.PackageURL}`);
+        core.debug(`Dependency PackageURL tostring - ${dependencyUrl.PackageURL.toString()}`);
         core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`);
         core.debug(`Dep Qualifiers - ${dependencyUrl.qualifiers}`);
         core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.qualifiers, null, 2)}`);
