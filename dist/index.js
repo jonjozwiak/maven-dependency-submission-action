@@ -32899,7 +32899,8 @@ function run() {
                     //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
                 }
                 if (pkg.relationship === 'direct') {
-                    tree += buildTree(snapshot, packageUrl, 0);
+                    //tree += buildTree(snapshot, packageUrl, 0);
+                    tree += buildTree(snapshot, pkg, 0);
                 }
             }
             core.info(`Tree - ${tree}`);

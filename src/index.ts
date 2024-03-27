@@ -56,7 +56,8 @@ async function run() {
 
 
       if (pkg.relationship === 'direct') {
-        tree += buildTree(snapshot, packageUrl, 0);
+        //tree += buildTree(snapshot, packageUrl, 0);
+        tree += buildTree(snapshot, pkg, 0);
       }
     }
 
@@ -77,7 +78,7 @@ async function run() {
 }
 
 // Note - this should be moved to a separate file
-function buildTree(snapshot: any, packageUrl: string, indent: number): string {
+function buildTree(snapshot: any, packageUrl, indent: number): string {
   core.debug(`Building tree for ${packageUrl}`)
   const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
   //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
