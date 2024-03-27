@@ -36,18 +36,18 @@ async function run() {
 
     for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
       const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
-      core.debug(`Out of buildTree - ${packageUrl}`)
-      core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`)
+      //core.debug(`Out of buildTree - ${packageUrl}`)
+      //core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`)
       //core.debug(`Out Package URL - ${pkg.package_url}`)
-      core.debug(`Out Relationiship - ${pkg.relationship}`)
-      core.debug(`Out Scope - ${pkg.scope}`)
+      //core.debug(`Out Relationiship - ${pkg.relationship}`)
+      //core.debug(`Out Scope - ${pkg.scope}`)
       //core.debug(`Out Dependencies - ${pkg.dependencies}`)
       if (pkg.relationship === 'direct') {
         tree += buildTree(snapshot, packageUrl, 0);
       }
     }
 
-    core.info(tree);
+    core.info(`Tree - ${tree}`);
 
     await core.summary
     core.summary.addHeading(`Dependencies`);
@@ -67,24 +67,25 @@ async function run() {
 function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   core.debug(`Building tree for ${packageUrl}`)
   const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
-  core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
-  console.log(`Package URL before check: ${pkg.package_url}`);
-  console.log(pkg);
-  console.log(pkg.package_url);
+  //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
+  //console.log(`Package URL before check: ${pkg.package_url}`);
+  //console.log(pkg);
+  //console.log(pkg.package_url);
 
-  console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
-  console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
+  //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
+  //console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
   //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
   if (!pkg) {
     core.debug(`Package not found ${packageUrl}`)
     return '';
   }
-  if (!pkg.package_url) {
-    core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
-    return '';
-  }
+  //if (!pkg.package_url) {
+  //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
+  //  return '';
+  //}
   let tree = ' '.repeat(indent) + packageUrl + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
-  core.debug(`Dependencies ${pkg.dependencies}`)
+  //core.debug(`Dependencies ${pkg.dependencies}`)
+  core.debug(`Dependencies ${pkg.depPackage.dependencies}`)
   //if (Array.isArray(pkg.dependencies)) {
   for (const dependencyUrl of pkg.depPackage.dependencies) {
     console.log(dependencyUrl);
