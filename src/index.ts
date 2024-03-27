@@ -87,12 +87,12 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
   //core.debug(`Dependencies ${pkg.dependencies}`)
   core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`)
   //if (Array.isArray(pkg.dependencies)) {
-  for (const dependencyUrl of pkg.depPackage) {
-    core.debug(`pkg.depPackage - ${dependencyUrl}`)
-    core.debug(`pkg.depPackage stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
-    core.debug(`pkg.depPackage.packageURL - ${dependencyUrl.packageURL}`)
-    core.debug(`pkg.depPackage.packageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
-  }
+  //for (const dependencyUrl of pkg.depPackage) {
+  //  core.debug(`pkg.depPackage - ${dependencyUrl}`)
+  //  core.debug(`pkg.depPackage stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
+  //  core.debug(`pkg.depPackage.packageURL - ${dependencyUrl.packageURL}`)
+  //  core.debug(`pkg.depPackage.packageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
+  //}
   for (const dependencyUrl of pkg.depPackage.dependencies) {
     //console.log(dependencyUrl);
     core.debug(`Dependency URL - ${dependencyUrl}`)
@@ -101,7 +101,7 @@ function buildTree(snapshot: any, packageUrl: string, indent: number): string {
     core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.PackageURL, null, 2)}`)
     const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
     core.debug(`My Dep - ${myDep}`)
-    
+
     tree += buildTree(snapshot, dependencyUrl, indent + 2);
   }
   //}
