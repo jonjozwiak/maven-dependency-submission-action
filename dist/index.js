@@ -32929,6 +32929,7 @@ function buildTree(snapshot, packageUrl, indent) {
     for (const dependencyUrl of pkg.depPackage.dependencies) {
         //console.log(dependencyUrl);
         core.debug(`Dependency URL - ${dependencyUrl}`);
+        core.debug(`Dependency URL - ${dependencyUrl.PackageURL}`);
         tree += buildTree(snapshot, dependencyUrl, indent + 2);
     }
     //}
