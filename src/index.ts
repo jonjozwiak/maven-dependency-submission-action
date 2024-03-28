@@ -156,6 +156,8 @@ function buildTree(snapshot: any, pkg, indent: number): string {
     //const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
     //core.debug(`My Dep - ${myDep}`)
 
+    core.debug(`Calling buildtree for dependency ${dependencyUrl.packageURL}`)
+    core.debug(`Note pkg - ${pkg} and dependencyUrl - ${dependencyUrl}`)
     tree += buildTree(snapshot, dependencyUrl.PackageURL, indent + 2);
   }
   //}
