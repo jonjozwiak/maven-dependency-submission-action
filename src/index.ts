@@ -157,8 +157,8 @@ function buildTree(snapshot: any, pkg, indent: number): string {
     //core.debug(`My Dep - ${myDep}`)
 
     core.debug(`Calling buildtree for dependency ${dependencyUrl.packageURL}`)
-    core.debug(`Note pkg - ${pkg} and dependencyUrl - ${dependencyUrl}`)
-    tree += buildTree(snapshot, dependencyUrl.PackageURL, indent + 2);
+    core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`)
+    tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
   }
   //}
   return tree;

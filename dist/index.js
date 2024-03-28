@@ -32976,8 +32976,8 @@ function buildTree(snapshot, pkg, indent) {
         //const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
         //core.debug(`My Dep - ${myDep}`)
         core.debug(`Calling buildtree for dependency ${dependencyUrl.packageURL}`);
-        core.debug(`Note pkg - ${pkg} and dependencyUrl - ${dependencyUrl}`);
-        tree += buildTree(snapshot, dependencyUrl.PackageURL, indent + 2);
+        core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`);
+        tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
     }
     //}
     return tree;
