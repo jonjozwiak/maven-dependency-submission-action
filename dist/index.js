@@ -32932,11 +32932,11 @@ function run() {
 }
 // Note - this should be moved to a separate file
 function buildTree(snapshot, pkg, indent) {
+    console.log(pkg);
     core.debug(`Building tree for ${pkg.depPackage.packageURL}`);
     //const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
     //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
     //console.log(`Package URL before check: ${pkg.package_url}`);
-    console.log(pkg);
     //console.log(pkg.package_url);
     //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
     //console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
