@@ -32932,8 +32932,8 @@ function run() {
 }
 // Note - this should be moved to a separate file
 function buildTree(snapshot, pkg, indent) {
-    console.log(pkg);
-    core.debug(`Building tree for ${pkg.depPackage.packageURL}`);
+    //console.log(pkg);
+    //core.debug(`Building tree for ${pkg.depPackage.packageURL}`)
     //const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
     //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
     //console.log(`Package URL before check: ${pkg.package_url}`);
@@ -32941,10 +32941,12 @@ function buildTree(snapshot, pkg, indent) {
     //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
     //console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
     //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
-    //if (!pkg) {
-    //  core.debug(`Package not found ${packageUrl}`)
-    //  return '';
-    //}
+    if (!pkg) {
+        core.debug(`Package not found ${pkg}`);
+        return '';
+    }
+    console.log(pkg);
+    core.debug(`Building tree for ${pkg.depPackage.packageURL}`);
     //if (!pkg.package_url) {
     //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
     //  return '';
