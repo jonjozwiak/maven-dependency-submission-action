@@ -32973,11 +32973,12 @@ function buildTree(snapshot, pkg, indent) {
         core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`);
         core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`);
         core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers.type, null, 2)}`);
-        //const myDep = `pkg:${dependencyUrl.type}/${dependencyUrl.namespace}/${dependencyUrl.name}@${dependencyUrl.version}?type=${dependencyUrl.qualifiers.type}`
-        //core.debug(`My Dep - ${myDep}`)
+        const myDep = `pkg:${dependencyUrl.PackageURL.type}/${dependencyUrl.PackageURL.namespace}/${dependencyUrl.PackageURL.name}@${dependencyUrl.PackageURL.version}?type=${dependencyUrl.PackageURL.qualifiers.type}`;
+        core.debug(`My Dep - ${myDep}`);
         core.debug(`Calling buildtree for dependency ${dependencyUrl.packageURL}`);
         core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`);
-        tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
+        //tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
+        tree += buildTree(snapshot, myDep, indent + 2);
     }
     //}
     return tree;
