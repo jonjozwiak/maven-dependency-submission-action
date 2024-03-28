@@ -32979,7 +32979,7 @@ function buildTree(snapshot, pkg, indent) {
         core.debug(`Calling buildtree for dependency ${myDep}`);
         core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`);
         //tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
-        tree += buildTree(snapshot, myDep, indent + 2);
+        tree += buildTree(snapshot, snapshot.manifests['bookstore-v3'].resolved[myDep], indent + 2);
     }
     //}
     return tree;
