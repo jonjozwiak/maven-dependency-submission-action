@@ -32851,21 +32851,32 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
+/*
 class Dependency {
-    constructor(depPackage, relationship, scope) {
-        this.depPackage = depPackage;
-        this.relationship = relationship;
-        this.scope = scope;
-    }
-    toJSON() {
-        return {
-            package_url: this.depPackage.packageURL.toString(),
-            relationship: this.relationship,
-            scope: this.scope,
-            dependencies: this.depPackage.packageDependencyIDs
-        };
-    }
+  depPackage: Package;
+  relationship?: DependencyRelationship;
+  scope?: DependencyScope;
+
+  constructor(
+    depPackage: Package,
+    relationship?: DependencyRelationship,
+    scope?: DependencyScope
+  ) {
+    this.depPackage = depPackage;
+    this.relationship = relationship;
+    this.scope = scope;
+  }
+
+  toJSON(): object {
+    return {
+      package_url: this.depPackage.packageURL.toString(),
+      relationship: this.relationship,
+      scope: this.scope,
+      dependencies: this.depPackage.packageDependencyIDs
+    };
+  }
 }
+*/
 function run() {
     return src_awaiter(this, void 0, void 0, function* () {
         let snapshot;
@@ -32930,14 +32941,7 @@ function run() {
                 [{ data: 'Package URL', header: true }, { data: 'Name', header: true }, { data: 'Namespace', header: true }, { data: 'Type', header: true }, { data: 'Version', header: true }, { data: 'Relationship', header: true }, { data: 'Scope', header: true }],
                 ...tree.replace(/ /g, '\u00A0').split('\n').filter(row => row.trim() !== '').map(row => {
                     const cells = row.split(',');
-                    return cells.map((cell, index) => {
-                        if (index === 1 && cells[5] === 'direct') { // If the 'Relationship' field is 'direct', bold the line in markdown
-                            return { data: '*' + cell };
-                        }
-                        else {
-                            return { data: cell };
-                        }
-                    });
+                    return cells.map(cell => ({ data: cell }));
                 })
             ]);
             core.summary.write();
@@ -32965,7 +32969,7 @@ function buildTree(snapshot, pkg, indent) {
         core.debug(`Package not found ${pkg}`);
         return '';
     }
-    console.log(pkg);
+    //console.log(pkg);
     core.debug(`Building tree for ${pkg.depPackage.packageURL}`);
     //if (!pkg.package_url) {
     //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)

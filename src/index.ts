@@ -8,6 +8,7 @@ import { Package } from '@github/dependency-submission-toolkit'; // Adjust this 
 type DependencyRelationship = 'direct' | 'indirect';
 type DependencyScope = 'runtime' | 'development';
 
+/*
 class Dependency {
   depPackage: Package;
   relationship?: DependencyRelationship;
@@ -32,7 +33,7 @@ class Dependency {
     };
   }
 }
-
+*/
 
 async function run() {
   let snapshot: Snapshot | undefined;
@@ -104,13 +105,7 @@ async function run() {
       [{data: 'Package URL', header: true}, {data: 'Name', header: true},  {data: 'Namespace', header: true}, {data: 'Type', header: true}, {data: 'Version', header: true}, {data: 'Relationship', header: true}, {data: 'Scope', header: true}],
       ...tree.replace(/ /g, '\u00A0').split('\n').filter(row => row.trim() !== '').map(row => {
         const cells = row.split(',');
-        return cells.map((cell, index) => {
-          if (index === 1 && cells[5] === 'direct') { // If the 'Relationship' field is 'direct', bold the line in markdown
-            return {data: '*' + cell};
-          } else {
-            return {data: cell};
-          }
-        });
+        return cells.map(cell => ({data: cell}));
       })
     ])
     core.summary.write()
@@ -143,7 +138,7 @@ function buildTree(snapshot: any, pkg, indent: number): string {
     core.debug(`Package not found ${pkg}`)
     return '';
   }
-  console.log(pkg);
+  //console.log(pkg);
   core.debug(`Building tree for ${pkg.depPackage.packageURL}`)
   //if (!pkg.package_url) {
   //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
