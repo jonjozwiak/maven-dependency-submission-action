@@ -32918,17 +32918,28 @@ function run() {
                     tree += buildTree(snapshot, pkg, 0);
                 }
             }
-            core.info(`Tree - ${tree}`);
+            core.info(`Dependency Tree:`);
+            core.info(`${tree}`);
             //await core.summary
             core.summary.addHeading(`Dependencies`);
-            core.summary.addTable([
-                [{ data: 'Package URL', header: true }, { data: 'Name', header: true }, { data: 'Namespace', header: true }, { data: 'Type', header: true }, { data: 'Version', header: true }, { data: 'Relationship', header: true }, { data: 'Scope', header: true }],
-                ...tree.replace(/ /g, '\u00A0').split('\n').map(row => row.split(',').map(cell => ({ data: cell })))
-            ]);
             //core.summary.addTable([
             //  [{data: 'Package URL', header: true}, {data: 'Name', header: true},  {data: 'Namespace', header: true}, {data: 'Type', header: true}, {data: 'Version', header: true}, {data: 'Relationship', header: true}, {data: 'Scope', header: true}],
-            //  ...tree.split('\n').map(row => row.split(',').map(cell => ({data: cell})))
+            //  ...tree.replace(/ /g, '\u00A0').split('\n').map(row => row.split(',').map(cell => ({data: cell})))
             //])
+            core.summary.addTable([
+                [{ data: 'Package URL', header: true }, { data: 'Name', header: true }, { data: 'Namespace', header: true }, { data: 'Type', header: true }, { data: 'Version', header: true }, { data: 'Relationship', header: true }, { data: 'Scope', header: true }],
+                ...tree.replace(/ /g, '\u00A0').split('\n').filter(row => row.trim() !== '').map(row => {
+                    const cells = row.split(',');
+                    return cells.map((cell, index) => {
+                        if (index === 1 && cells[5] === 'direct') { // If the 'Relationship' field is 'direct', bold the line in markdown
+                            return { data: '*' + cell };
+                        }
+                        else {
+                            return { data: cell };
+                        }
+                    });
+                })
+            ]);
             core.summary.write();
             core.startGroup(`Dependency Snapshot`);
             core.info(snapshot.prettyJSON());
@@ -32962,8 +32973,8 @@ function buildTree(snapshot, pkg, indent) {
     //}
     let tree = ' '.repeat(indent) + pkg.depPackage.packageURL + ', ' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + '\n';
     //core.debug(`Dependencies ${pkg.dependencies}`)
-    core.debug(pkg);
-    core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`);
+    //core.debug(pkg)
+    //core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`)
     //if (Array.isArray(pkg.dependencies)) {
     //for (const dependencyUrl of pkg.depPackage) {
     //  core.debug(`pkg.depPackage - ${dependencyUrl}`)
@@ -32972,21 +32983,21 @@ function buildTree(snapshot, pkg, indent) {
     //  core.debug(`pkg.depPackage.packageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
     //}
     for (const dependencyUrl of pkg.depPackage.dependencies) {
-        console.log(dependencyUrl);
-        core.debug(`Dependency URL - ${dependencyUrl}`);
-        core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`);
-        core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`);
-        core.debug(`Dependency PackageURL tostring - ${dependencyUrl.packageURL.toString()}`);
-        core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`);
-        core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`);
-        core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`);
-        core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`);
-        core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers.type, null, 2)}`);
+        //console.log(dependencyUrl);
+        //core.debug(`Dependency URL - ${dependencyUrl}`)
+        //core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
+        //core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
+        //core.debug(`Dependency PackageURL tostring - ${dependencyUrl.packageURL.toString()}`)
+        //core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
+        //core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`)
+        //core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`)
+        //core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`)
+        //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers.type, null, 2)}`)
         const myDep = `pkg:${dependencyUrl.packageURL.type}/${dependencyUrl.packageURL.namespace}/${dependencyUrl.packageURL.name}@${dependencyUrl.packageURL.version}?type=${dependencyUrl.packageURL.qualifiers.type}`;
-        core.debug(`My Dep - ${myDep}`);
+        //core.debug(`My Dep - ${myDep}`)
         //core.debug(`Calling buildtree for dependency ${dependencyUrl.packageURL}`)
         core.debug(`Calling buildtree for dependency ${myDep}`);
-        core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`);
+        //core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`)
         //tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
         tree += buildTree(snapshot, snapshot.manifests['bookstore-v3'].resolved[myDep], indent + 2);
     }
