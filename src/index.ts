@@ -98,8 +98,12 @@ async function run() {
     core.summary.addHeading(`Dependencies`);
     core.summary.addTable([
       [{data: 'Package URL', header: true}, {data: 'Name', header: true},  {data: 'Namespace', header: true}, {data: 'Type', header: true}, {data: 'Version', header: true}, {data: 'Relationship', header: true}, {data: 'Scope', header: true}],
-      ...tree.split('\n').map(row => row.split(',').map(cell => ({data: cell})))
+      ...tree.replace(/ /g, '\u00A0').split('\n').map(row => row.split(',').map(cell => ({data: cell})))
     ])
+    //core.summary.addTable([
+    //  [{data: 'Package URL', header: true}, {data: 'Name', header: true},  {data: 'Namespace', header: true}, {data: 'Type', header: true}, {data: 'Version', header: true}, {data: 'Relationship', header: true}, {data: 'Scope', header: true}],
+    //  ...tree.split('\n').map(row => row.split(',').map(cell => ({data: cell})))
+    //])
     core.summary.write()
 
 
