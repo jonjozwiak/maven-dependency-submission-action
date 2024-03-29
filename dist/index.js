@@ -32919,8 +32919,13 @@ function run() {
                 }
             }
             core.info(`Tree - ${tree}`);
-            yield core.summary;
+            //await core.summary
             core.summary.addHeading(`Dependencies`);
+            core.summary.addTable([
+                [{ data: 'Package URL', header: true }, { data: 'Name', header: true }, { data: 'Namespace', header: true }, { data: 'Type', header: true }, { data: 'Version', header: true }, { data: 'Relationship', header: true }, { data: 'Scope', header: true }],
+                ...tree.split('\n').map(row => row.split(',').map(cell => ({ data: cell })))
+            ]);
+            core.summary.write();
             core.startGroup(`Dependency Snapshot`);
             core.info(snapshot.prettyJSON());
             core.endGroup();
@@ -32951,7 +32956,7 @@ function buildTree(snapshot, pkg, indent) {
     //  core.debug(`Package URL not found ${packageUrl} - ${pkg.package_url}`)
     //  return '';
     //}
-    let tree = ' '.repeat(indent) + pkg.depPackage.packageURL + ' (' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + ')\n';
+    let tree = ' '.repeat(indent) + pkg.depPackage.packageURL + ', ' + pkg.depPackage.packageURL.name + ', ' + pkg.depPackage.packageURL.namespace + ', ' + pkg.depPackage.packageURL.type + ', ' + pkg.depPackage.packageURL.version + ', ' + pkg.relationship + ', ' + pkg.scope + '\n';
     //core.debug(`Dependencies ${pkg.dependencies}`)
     core.debug(pkg);
     core.debug(`Dependencies ${JSON.stringify(pkg.depPackage.dependencies, null, 2)}`);
