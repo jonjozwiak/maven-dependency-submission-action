@@ -32965,6 +32965,7 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
  // REST API client to pull Dependabot Alerts
+
 /*
 class Dependency {
   depPackage: Package;
@@ -33048,11 +33049,10 @@ function run() {
             core.info(`Dependency Tree:`);
             core.info(`${tree}`);
             // Process Dependabot Alerts
-            const owner = process.env.GITHUB_REPOSITORY_OWNER;
-            const repo = process.env.GITHUB_REPOSITORY;
-            const token = process.env.GITHUB_TOKEN;
-            core.info(`Owner: ${owner}, Repo: ${repo}, Token: ${token}`);
-            const dependabotAlerts = listDependabotAlerts(owner, repo, token);
+            const repo = github.context.repo;
+            const githubToken = core.getInput('token') || (yield core.getIDToken());
+            core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`);
+            const dependabotAlerts = listDependabotAlerts(repo, githubToken);
             core.info(`Dependabot Alerts:`);
             core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
             //await core.summary
@@ -33134,13 +33134,13 @@ function buildTree(snapshot, manifestName, pkg, indent) {
 }
 // TODO - Obviously dependabot alerts are not going to exist before the snapshot is submitted
 // I need to split this into a separate action if this is going to be useful... just testing...
-function listDependabotAlerts(owner, repo, token) {
+function listDependabotAlerts(repo, token) {
     return src_awaiter(this, void 0, void 0, function* () {
         const octokit = new rest_dist_node.Octokit({ auth: token });
         try {
-            const alerts = yield octokit.request(`GET /repos/${owner}/${repo}/dependabot/alerts`, {
-                owner,
-                repo,
+            const alerts = yield octokit.request('GET /repos/{owner}/{repo}/dependabot/alerts', {
+                owner: repo.owner,
+                repo: repo.repo,
                 accept: 'application/vnd.github+json',
                 'X-GitHub-Api-Version': '2022-11-28'
             });
