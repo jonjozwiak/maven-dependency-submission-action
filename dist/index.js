@@ -33051,6 +33051,7 @@ function run() {
             const owner = process.env.GITHUB_REPOSITORY_OWNER;
             const repo = process.env.GITHUB_REPOSITORY;
             const token = process.env.GITHUB_TOKEN;
+            core.info(`Owner: ${owner}, Repo: ${repo}, Token: ${token}`);
             const dependabotAlerts = listDependabotAlerts(owner, repo, token);
             core.info(`Dependabot Alerts:`);
             core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
@@ -33131,11 +33132,13 @@ function buildTree(snapshot, manifestName, pkg, indent) {
     //}
     return tree;
 }
+// TODO - Obviously dependabot alerts are not going to exist before the snapshot is submitted
+// I need to split this into a separate action if this is going to be useful... just testing...
 function listDependabotAlerts(owner, repo, token) {
     return src_awaiter(this, void 0, void 0, function* () {
         const octokit = new rest_dist_node.Octokit({ auth: token });
         try {
-            const alerts = yield octokit.request('GET /repos/{owner}/{repo}/dependabot/alerts', {
+            const alerts = yield octokit.request(`GET /repos/${owner}/${repo}/dependabot/alerts`, {
                 owner,
                 repo,
                 accept: 'application/vnd.github+json',
