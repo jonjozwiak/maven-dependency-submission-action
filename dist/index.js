@@ -4513,6 +4513,66 @@ paginateRest.VERSION = VERSION;
 
 /***/ }),
 
+/***/ 8883:
+/***/ ((module) => {
+
+"use strict";
+
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// pkg/dist-src/index.js
+var dist_src_exports = {};
+__export(dist_src_exports, {
+  requestLog: () => requestLog
+});
+module.exports = __toCommonJS(dist_src_exports);
+
+// pkg/dist-src/version.js
+var VERSION = "4.0.1";
+
+// pkg/dist-src/index.js
+function requestLog(octokit) {
+  octokit.hook.wrap("request", (request, options) => {
+    octokit.log.debug("request", options);
+    const start = Date.now();
+    const requestOptions = octokit.request.endpoint.parse(options);
+    const path = requestOptions.url.replace(options.baseUrl, "");
+    return request(options).then((response) => {
+      octokit.log.info(
+        `${requestOptions.method} ${path} - ${response.status} in ${Date.now() - start}ms`
+      );
+      return response;
+    }).catch((error) => {
+      octokit.log.info(
+        `${requestOptions.method} ${path} - ${error.status} in ${Date.now() - start}ms`
+      );
+      throw error;
+    });
+  });
+}
+requestLog.VERSION = VERSION;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (0);
+
+
+/***/ }),
+
 /***/ 3044:
 /***/ ((module) => {
 
@@ -6938,6 +6998,57 @@ var request = withDefaults(import_endpoint.endpoint, {
   headers: {
     "user-agent": `octokit-request.js/${VERSION} ${(0, import_universal_user_agent.getUserAgent)()}`
   }
+});
+// Annotate the CommonJS export names for ESM import in node:
+0 && (0);
+
+
+/***/ }),
+
+/***/ 5375:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// pkg/dist-src/index.js
+var dist_src_exports = {};
+__export(dist_src_exports, {
+  Octokit: () => Octokit
+});
+module.exports = __toCommonJS(dist_src_exports);
+var import_core = __nccwpck_require__(6762);
+var import_plugin_request_log = __nccwpck_require__(8883);
+var import_plugin_paginate_rest = __nccwpck_require__(4193);
+var import_plugin_rest_endpoint_methods = __nccwpck_require__(3044);
+
+// pkg/dist-src/version.js
+var VERSION = "20.1.0";
+
+// pkg/dist-src/index.js
+var Octokit = import_core.Octokit.plugin(
+  import_plugin_request_log.requestLog,
+  import_plugin_rest_endpoint_methods.legacyRestEndpointMethods,
+  import_plugin_paginate_rest.paginateRest
+).defaults({
+  userAgent: `octokit-rest.js/${VERSION}`
 });
 // Annotate the CommonJS export names for ESM import in node:
 0 && (0);
@@ -32266,7 +32377,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"maven-dependency-submission-action","version":"4.0.2","description":"Submit Maven dependencies to GitHub dependency submission API","main":"index.js","scripts":{"base-build":"npm ci && tsc","build":"npm run base-build && npm exec -- @vercel/ncc build --source-map lib/src/index.js","build-exe":"npm run build && pkg package.json --compress Gzip","test":"vitest --run"},"repository":{"type":"git","url":"git+https://github.com/advanced-security/maven-dependency-submission-action.git"},"keywords":[],"author":"GitHub, Inc","license":"MIT","bugs":{"url":"https://github.com/advanced-security/maven-dependency-submission-action/issues"},"homepage":"https://github.com/advanced-security/maven-dependency-submission-action","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@github/dependency-submission-toolkit":"^2.0.4","commander":"^9.4.0","packageurl-js":"^1.2.0"},"devDependencies":{"@types/chai":"^4.3.1","@vercel/ncc":"^0.38.1","chai":"^4.3.6","pkg":"^5.8.0","ts-node":"^10.9.2","typescript":"^5.3.3","vitest":"^1.2.1"},"bin":{"cli":"lib/src/executable/cli.js"},"pkg":{"targets":["node18-linux-x64","node18-win-x64","node18-macos-x64"],"assets":["package.json"],"publicPackages":"*","outputPath":"cli"}}');
+module.exports = JSON.parse('{"name":"maven-dependency-submission-action","version":"4.0.2","description":"Submit Maven dependencies to GitHub dependency submission API","main":"index.js","scripts":{"base-build":"npm ci && tsc","build":"npm run base-build && npm exec -- @vercel/ncc build --source-map lib/src/index.js","build-exe":"npm run build && pkg package.json --compress Gzip","test":"vitest --run"},"repository":{"type":"git","url":"git+https://github.com/advanced-security/maven-dependency-submission-action.git"},"keywords":[],"author":"GitHub, Inc","license":"MIT","bugs":{"url":"https://github.com/advanced-security/maven-dependency-submission-action/issues"},"homepage":"https://github.com/advanced-security/maven-dependency-submission-action","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@github/dependency-submission-toolkit":"^2.0.4","@octokit/rest":"^20.1.0","commander":"^9.4.0","packageurl-js":"^1.2.0"},"devDependencies":{"@types/chai":"^4.3.1","@vercel/ncc":"^0.38.1","chai":"^4.3.6","pkg":"^5.8.0","ts-node":"^10.9.2","typescript":"^5.3.3","vitest":"^1.2.1"},"bin":{"cli":"lib/src/executable/cli.js"},"pkg":{"targets":["node18-linux-x64","node18-win-x64","node18-macos-x64"],"assets":["package.json"],"publicPackages":"*","outputPath":"cli"}}');
 
 /***/ })
 
@@ -32837,6 +32948,8 @@ function getNonEmtptyValue(str) {
     return undefined;
 }
 //# sourceMappingURL=snapshot-generator.js.map
+// EXTERNAL MODULE: ./node_modules/@octokit/rest/dist-node/index.js
+var rest_dist_node = __nccwpck_require__(5375);
 ;// CONCATENATED MODULE: ./lib/src/index.js
 var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32851,6 +32964,7 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
+ // REST API client to pull Dependabot Alerts
 /*
 class Dependency {
   depPackage: Package;
@@ -32905,32 +33019,41 @@ function run() {
             // Write dependency tree as output
             let tree = '';
             // TODO - Remove hardcoded manifest name
-            for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
-                const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
-                //core.debug(`Out of buildTree - ${packageUrl}`)
-                //core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`)
-                //core.debug(`Out Package URL - ${pkg.package_url}`)
-                //core.debug(`Out Relationiship - ${pkg.relationship}`)
-                //core.debug(`Out Scope - ${pkg.scope}`)
-                //core.debug(`Out Dependencies - ${pkg.dependencies}`)
-                //for (const dependencyUrl of pkg.depPackage.dependencies) {
-                //  console.log(dependencyUrl);
-                //  core.debug(`Dependency URL - ${dependencyUrl}`)
-                //  core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
-                //  core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
-                //  core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
-                //  core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`)
-                //  core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`)
-                //  //core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`)
-                //  //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
-                //}
-                if (pkg.relationship === 'direct') {
-                    //tree += buildTree(snapshot, packageUrl, 0);
-                    tree += buildTree(snapshot, pkg, 0);
+            for (const manifestName in snapshot.manifests) {
+                for (const packageUrl in snapshot.manifests[manifestName].resolved) {
+                    const pkg = snapshot.manifests[manifestName].resolved[packageUrl];
+                    //core.debug(`Out of buildTree - ${packageUrl}`)
+                    //core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`)
+                    //core.debug(`Out Package URL - ${pkg.package_url}`)
+                    //core.debug(`Out Relationiship - ${pkg.relationship}`)
+                    //core.debug(`Out Scope - ${pkg.scope}`)
+                    //core.debug(`Out Dependencies - ${pkg.dependencies}`)
+                    //for (const dependencyUrl of pkg.depPackage.dependencies) {
+                    //  console.log(dependencyUrl);
+                    //  core.debug(`Dependency URL - ${dependencyUrl}`)
+                    //  core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
+                    //  core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
+                    //  core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
+                    //  core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`)
+                    //  core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`)
+                    //  //core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`)
+                    //  //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
+                    //}
+                    if (pkg.relationship === 'direct') {
+                        //tree += buildTree(snapshot, packageUrl, 0);
+                        tree += buildTree(snapshot, manifestName, pkg, 0);
+                    }
                 }
             }
             core.info(`Dependency Tree:`);
             core.info(`${tree}`);
+            // Process Dependabot Alerts
+            const owner = process.env.GITHUB_REPOSITORY_OWNER;
+            const repo = process.env.GITHUB_REPOSITORY;
+            const token = process.env.GITHUB_TOKEN;
+            const dependabotAlerts = listDependabotAlerts(owner, repo, token);
+            core.info(`Dependabot Alerts:`);
+            core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
             //await core.summary
             core.summary.addHeading(`Dependencies`);
             //core.summary.addTable([
@@ -32955,16 +33078,16 @@ function run() {
     });
 }
 // Note - this should be moved to a separate file
-function buildTree(snapshot, pkg, indent) {
+function buildTree(snapshot, manifestName, pkg, indent) {
     //console.log(pkg);
     //core.debug(`Building tree for ${pkg.depPackage.packageURL}`)
-    //const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+    //const pkg = snapshot.manifests[manifestName].resolved[packageUrl];
     //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
     //console.log(`Package URL before check: ${pkg.package_url}`);
     //console.log(pkg.package_url);
     //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
     //console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
-    //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
+    //core.debug(`Available packages: ${Object.keys(snapshot.manifests[manifestName].resolved)}`);
     if (!pkg) {
         core.debug(`Package not found ${pkg}`);
         return '';
@@ -33003,10 +33126,27 @@ function buildTree(snapshot, pkg, indent) {
         core.debug(`Calling buildtree for dependency ${myDep}`);
         //core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`)
         //tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
-        tree += buildTree(snapshot, snapshot.manifests['bookstore-v3'].resolved[myDep], indent + 2);
+        tree += buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2);
     }
     //}
     return tree;
+}
+function listDependabotAlerts(owner, repo, token) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const octokit = new rest_dist_node.Octokit({ auth: token });
+        try {
+            const alerts = yield octokit.request('GET /repos/{owner}/{repo}/vulnerability-alerts', {
+                owner,
+                repo,
+                accept: 'application/vnd.github.dorian-preview+json'
+            });
+            return alerts.data;
+        }
+        catch (error) {
+            console.error(`Failed to fetch Dependabot alerts: ${error.message}`);
+            return null;
+        }
+    });
 }
 run();
 //# sourceMappingURL=index.js.map

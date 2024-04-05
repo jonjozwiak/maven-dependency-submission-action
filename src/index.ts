@@ -5,6 +5,8 @@ import { SnapshotConfig, generateSnapshot } from './snapshot-generator';
 
 import { Package } from '@github/dependency-submission-toolkit'; // Adjust this import if needed
 
+import { Octokit } from "@octokit/rest"; // REST API client to pull Dependabot Alerts
+
 type DependencyRelationship = 'direct' | 'indirect';
 type DependencyScope = 'runtime' | 'development';
 
@@ -66,34 +68,45 @@ async function run() {
     let tree = '';
     // TODO - Remove hardcoded manifest name
 
-    for (const packageUrl in snapshot.manifests['bookstore-v3'].resolved) {
-      const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
-      //core.debug(`Out of buildTree - ${packageUrl}`)
-      //core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`)
-      //core.debug(`Out Package URL - ${pkg.package_url}`)
-      //core.debug(`Out Relationiship - ${pkg.relationship}`)
-      //core.debug(`Out Scope - ${pkg.scope}`)
-      //core.debug(`Out Dependencies - ${pkg.dependencies}`)
-      //for (const dependencyUrl of pkg.depPackage.dependencies) {
-      //  console.log(dependencyUrl);
-      //  core.debug(`Dependency URL - ${dependencyUrl}`)
-      //  core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
-      //  core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
-      //  core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
-      //  core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`)
-      //  core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`)
-      //  //core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`)
-      //  //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
-      //}
+    for (const manifestName in snapshot.manifests) {
+      for (const packageUrl in snapshot.manifests[manifestName].resolved) {
+        const pkg = snapshot.manifests[manifestName].resolved[packageUrl];
+        //core.debug(`Out of buildTree - ${packageUrl}`)
+        //core.debug(`Out Package - ${JSON.stringify(pkg, null, 2)}`)
+        //core.debug(`Out Package URL - ${pkg.package_url}`)
+        //core.debug(`Out Relationiship - ${pkg.relationship}`)
+        //core.debug(`Out Scope - ${pkg.scope}`)
+        //core.debug(`Out Dependencies - ${pkg.dependencies}`)
+        //for (const dependencyUrl of pkg.depPackage.dependencies) {
+        //  console.log(dependencyUrl);
+        //  core.debug(`Dependency URL - ${dependencyUrl}`)
+        //  core.debug(`Dependency URL stringify - ${JSON.stringify(dependencyUrl, null, 2)}`)
+        //  core.debug(`Dependency PackageURL - ${dependencyUrl.packageURL}`)
+        //  core.debug(`Dependency PackageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
+        //  core.debug(`Dep Qualifiers - ${dependencyUrl.packageURL.qualifiers}`)
+        //  core.debug(`Dep Qualifiers stringify - ${JSON.stringify(dependencyUrl.packageURL.qualifiers, null, 2)}`)
+        //  //core.debug(`Dep Qualifiers type - ${dependencyUrl.packageURL.qualifiers.type}`)
+        //  //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
+        //}
 
 
-      if (pkg.relationship === 'direct') {
-        //tree += buildTree(snapshot, packageUrl, 0);
-        tree += buildTree(snapshot, pkg, 0);
+        if (pkg.relationship === 'direct') {
+          //tree += buildTree(snapshot, packageUrl, 0);
+          tree += buildTree(snapshot, manifestName, pkg, 0);
+        }
       }
     }
     core.info(`Dependency Tree:`)
     core.info(`${tree}`);
+
+    // Process Dependabot Alerts
+    const owner = process.env.GITHUB_REPOSITORY_OWNER as string;
+    const repo = process.env.GITHUB_REPOSITORY as string;
+    const token = process.env.GITHUB_TOKEN as string;
+    const dependabotAlerts = listDependabotAlerts(owner, repo, token)
+
+    core.info(`Dependabot Alerts:`)
+    core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
 
     //await core.summary
     core.summary.addHeading(`Dependencies`);
@@ -122,10 +135,10 @@ async function run() {
 }
 
 // Note - this should be moved to a separate file
-function buildTree(snapshot: any, pkg, indent: number): string {
+function buildTree(snapshot: any, manifestName, pkg, indent: number): string {
   //console.log(pkg);
   //core.debug(`Building tree for ${pkg.depPackage.packageURL}`)
-  //const pkg = snapshot.manifests['bookstore-v3'].resolved[packageUrl];
+  //const pkg = snapshot.manifests[manifestName].resolved[packageUrl];
   //core.debug(`Package in buildTree - ${JSON.stringify(pkg, null, 2)}`)
   //console.log(`Package URL before check: ${pkg.package_url}`);
 
@@ -133,7 +146,7 @@ function buildTree(snapshot: any, pkg, indent: number): string {
 
   //console.log(`DepPackage Package URL before check: ${pkg.depPackage.packageURL}`);
   //console.log(`DepPackge Dependencies before check: ${pkg.depPackage.dependencies}`);
-  //core.debug(`Available packages: ${Object.keys(snapshot.manifests['bookstore-v3'].resolved)}`);
+  //core.debug(`Available packages: ${Object.keys(snapshot.manifests[manifestName].resolved)}`);
   if (!pkg) {
     core.debug(`Package not found ${pkg}`)
     return '';
@@ -173,11 +186,27 @@ function buildTree(snapshot: any, pkg, indent: number): string {
     core.debug(`Calling buildtree for dependency ${myDep}`)
     //core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`)
     //tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
-    tree += buildTree(snapshot, snapshot.manifests['bookstore-v3'].resolved[myDep], indent + 2);
+    tree += buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2);
   }
   //}
   return tree;
 }
 
+async function listDependabotAlerts(owner: string, repo: string, token: string) {
+  const octokit = new Octokit({ auth: token });
+
+  try {
+    const alerts = await octokit.request('GET /repos/{owner}/{repo}/vulnerability-alerts', {
+      owner,
+      repo,
+      accept: 'application/vnd.github.dorian-preview+json'
+    });
+
+    return alerts.data;
+  } catch (error: any) {
+    console.error(`Failed to fetch Dependabot alerts: ${error.message}`);
+    return null;
+  }
+}
 
 run();
