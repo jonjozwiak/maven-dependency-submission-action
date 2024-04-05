@@ -33135,10 +33135,11 @@ function listDependabotAlerts(owner, repo, token) {
     return src_awaiter(this, void 0, void 0, function* () {
         const octokit = new rest_dist_node.Octokit({ auth: token });
         try {
-            const alerts = yield octokit.request('GET /repos/{owner}/{repo}/vulnerability-alerts', {
+            const alerts = yield octokit.request('GET /repos/{owner}/{repo}/dependabot/alerts', {
                 owner,
                 repo,
-                accept: 'application/vnd.github.dorian-preview+json'
+                accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
             });
             return alerts.data;
         }
