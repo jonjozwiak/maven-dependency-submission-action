@@ -5,7 +5,7 @@ import { SnapshotConfig, generateSnapshot } from './snapshot-generator';
 
 import { Package } from '@github/dependency-submission-toolkit'; // Adjust this import if needed
 
-import { Octokit } from "@octokit/rest"; // REST API client to pull Dependabot Alerts
+//import { Octokit } from "@octokit/rest"; // REST API client to pull Dependabot Alerts
 import * as github from '@actions/github'
 import type { Context } from '@actions/github/lib/context.js'
 
@@ -198,7 +198,8 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number): string {
 // TODO - Obviously dependabot alerts are not going to exist before the snapshot is submitted
 // I need to split this into a separate action if this is going to be useful... just testing...
 async function listDependabotAlerts(repo: any, token: string) {
-  const octokit = new Octokit({ auth: token });
+  //const octokit = new Octokit({ auth: token });
+  const octokit = github.getOctokit(token);
 
   try {
     const alerts = await octokit.request('GET /repos/{owner}/{repo}/dependabot/alerts', {
@@ -210,6 +211,7 @@ async function listDependabotAlerts(repo: any, token: string) {
 
     return alerts.data;
   } catch (error: any) {
+    console.error(`Failed to fetch Dependabot alerts: ${error}`);
     console.error(`Failed to fetch Dependabot alerts: ${error.message}`);
     return null;
   }
