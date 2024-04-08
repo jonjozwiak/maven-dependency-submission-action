@@ -32333,7 +32333,7 @@ var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/packageurl-js/index.js
 var packageurl_js = __nccwpck_require__(8915);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
+var lib_github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/@octokit/request-error/dist-node/index.js
 var dist_node = __nccwpck_require__(537);
 ;// CONCATENATED MODULE: ./node_modules/@github/dependency-submission-toolkit/dist/index.js
@@ -32342,7 +32342,7 @@ var dist_node = __nccwpck_require__(537);
 
 
 
-var o=class{depPackage;relationship;scope;constructor(e,t,s){this.depPackage=e,t!==void 0&&(this.relationship=t),s!==void 0&&(this.scope=s);}toJSON(){return {package_url:this.depPackage.packageURL.toString(),relationship:this.relationship,scope:this.scope,dependencies:this.depPackage.packageDependencyIDs}}},g=class{resolved;name;file;constructor(e,t){this.resolved={},this.name=e,t&&(this.file={source_location:t});}addDirectDependency(e,t){this.resolved[e.packageID()]=new o(e,"direct",t);}addIndirectDependency(e,t){this.resolved[e.packageID()]??=new o(e,"indirect",t);}hasDependency(e){return this.lookupDependency(e)!==void 0}lookupDependency(e){return this.resolved[e.packageID()]}countDependencies(){return Object.keys(this.resolved).length}filterDependencies(e){return Object.values(this.resolved).reduce((t,s)=>(e(s)&&t.push(s.depPackage),t),[])}directDependencies(){return this.filterDependencies(e=>e.relationship==="direct")}indirectDependencies(){return this.filterDependencies(e=>e.relationship==="indirect")}},u=class extends (/* unused pure expression or super */ null && (g)){addBuildDependency(e){this.addDirectDependency(e,"runtime");for(let t of e.dependencies)this.addIndirectDependency(t,"runtime");}};var c=class{packageURL;dependencies;constructor(e){typeof e=="string"?this.packageURL=packageurl_js.PackageURL.fromString(e):this.packageURL=e,this.dependencies=[];}dependsOn(e){return this.dependencies.push(e),this}dependsOnPackages(e){for(let t of e)this.dependsOn(t);return this}get packageDependencyIDs(){return this.dependencies.map(e=>e.packageID())}packageID(){return this.packageURL.toString()}namespace(){return this.packageURL.namespace??null}name(){return this.packageURL.name}version(){return this.packageURL.version||""}matching(e){return (e.namespace===void 0||this.packageURL.namespace===e.namespace)&&(e.name===void 0||this.packageURL.name===e.name)&&(e.version===void 0||this.packageURL.version===e.version)}};var h=class{database;constructor(){this.database={};}package(e){let t=this.lookupPackage(e);if(t)return t;let s=new c(e);return this.addPackage(s),s}packagesMatching(e){return Object.values(this.database).filter(t=>t.matching(e))}addPackage(e){this.database[e.packageURL.toString()]=e;}removePackage(e){delete this.database[e.packageURL.toString()];}lookupPackage(e){if(typeof e=="string"){let t=packageurl_js.PackageURL.fromString(e);return this.database[t.toString()]}return this.database[e.toString()]}hasPackage(e){return this.lookupPackage(e)!==void 0}countPackages(){return Object.values(this.database).length}};function y(r){return {correlator:r.job,id:r.runId.toString()}}function P(r){return ["pull_request","pull_request_comment","pull_request_review","pull_request_review_comment"].includes(r.eventName)?r.payload.pull_request.head.sha:r.sha}var l=class{manifests;version;job;sha;ref;scanned;detector;constructor(e,t=github.context,s,p=new Date,n=0){this.detector=e,this.version=n,this.job=s||y(t),this.sha=P(t),this.ref=t.ref,this.scanned=p.toISOString(),this.manifests={};}addManifest(e){this.manifests[e.name]=e;}prettyJSON(){return JSON.stringify(this,void 0,4)}};async function L(r,e=github.context){core.setOutput("snapshot",JSON.stringify(r)),core.notice("Submitting snapshot..."),core.notice(r.prettyJSON());let t=e.repo,s=core.getInput("token")||await core.getIDToken(),p=github.getOctokit(s);try{let n=await p.request("POST /repos/{owner}/{repo}/dependency-graph/snapshots",{headers:{accept:"application/vnd.github.foo-bar-preview+json"},owner:t.owner,repo:t.repo,...r}),d=n.data.result;d==="SUCCESS"||d==="ACCEPTED"?core.notice(`Snapshot successfully created at ${n.data.created_at.toString()}`):core.error(`Snapshot creation failed with result: "${d}: ${n.data.message}"`);}catch(n){throw n instanceof dist_node.RequestError&&(core.error(`HTTP Status ${n.status} for request ${n.request.method} ${n.request.url}`),n.response&&core.error(`Response body:
+var o=class{depPackage;relationship;scope;constructor(e,t,s){this.depPackage=e,t!==void 0&&(this.relationship=t),s!==void 0&&(this.scope=s);}toJSON(){return {package_url:this.depPackage.packageURL.toString(),relationship:this.relationship,scope:this.scope,dependencies:this.depPackage.packageDependencyIDs}}},g=class{resolved;name;file;constructor(e,t){this.resolved={},this.name=e,t&&(this.file={source_location:t});}addDirectDependency(e,t){this.resolved[e.packageID()]=new o(e,"direct",t);}addIndirectDependency(e,t){this.resolved[e.packageID()]??=new o(e,"indirect",t);}hasDependency(e){return this.lookupDependency(e)!==void 0}lookupDependency(e){return this.resolved[e.packageID()]}countDependencies(){return Object.keys(this.resolved).length}filterDependencies(e){return Object.values(this.resolved).reduce((t,s)=>(e(s)&&t.push(s.depPackage),t),[])}directDependencies(){return this.filterDependencies(e=>e.relationship==="direct")}indirectDependencies(){return this.filterDependencies(e=>e.relationship==="indirect")}},u=class extends (/* unused pure expression or super */ null && (g)){addBuildDependency(e){this.addDirectDependency(e,"runtime");for(let t of e.dependencies)this.addIndirectDependency(t,"runtime");}};var c=class{packageURL;dependencies;constructor(e){typeof e=="string"?this.packageURL=packageurl_js.PackageURL.fromString(e):this.packageURL=e,this.dependencies=[];}dependsOn(e){return this.dependencies.push(e),this}dependsOnPackages(e){for(let t of e)this.dependsOn(t);return this}get packageDependencyIDs(){return this.dependencies.map(e=>e.packageID())}packageID(){return this.packageURL.toString()}namespace(){return this.packageURL.namespace??null}name(){return this.packageURL.name}version(){return this.packageURL.version||""}matching(e){return (e.namespace===void 0||this.packageURL.namespace===e.namespace)&&(e.name===void 0||this.packageURL.name===e.name)&&(e.version===void 0||this.packageURL.version===e.version)}};var h=class{database;constructor(){this.database={};}package(e){let t=this.lookupPackage(e);if(t)return t;let s=new c(e);return this.addPackage(s),s}packagesMatching(e){return Object.values(this.database).filter(t=>t.matching(e))}addPackage(e){this.database[e.packageURL.toString()]=e;}removePackage(e){delete this.database[e.packageURL.toString()];}lookupPackage(e){if(typeof e=="string"){let t=packageurl_js.PackageURL.fromString(e);return this.database[t.toString()]}return this.database[e.toString()]}hasPackage(e){return this.lookupPackage(e)!==void 0}countPackages(){return Object.values(this.database).length}};function y(r){return {correlator:r.job,id:r.runId.toString()}}function P(r){return ["pull_request","pull_request_comment","pull_request_review","pull_request_review_comment"].includes(r.eventName)?r.payload.pull_request.head.sha:r.sha}var l=class{manifests;version;job;sha;ref;scanned;detector;constructor(e,t=lib_github.context,s,p=new Date,n=0){this.detector=e,this.version=n,this.job=s||y(t),this.sha=P(t),this.ref=t.ref,this.scanned=p.toISOString(),this.manifests={};}addManifest(e){this.manifests[e.name]=e;}prettyJSON(){return JSON.stringify(this,void 0,4)}};async function L(r,e=lib_github.context){core.setOutput("snapshot",JSON.stringify(r)),core.notice("Submitting snapshot..."),core.notice(r.prettyJSON());let t=e.repo,s=core.getInput("token")||await core.getIDToken(),p=lib_github.getOctokit(s);try{let n=await p.request("POST /repos/{owner}/{repo}/dependency-graph/snapshots",{headers:{accept:"application/vnd.github.foo-bar-preview+json"},owner:t.owner,repo:t.repo,...r}),d=n.data.result;d==="SUCCESS"||d==="ACCEPTED"?core.notice(`Snapshot successfully created at ${n.data.created_at.toString()}`):core.error(`Snapshot creation failed with result: "${d}: ${n.data.message}"`);}catch(n){throw n instanceof dist_node.RequestError&&(core.error(`HTTP Status ${n.status} for request ${n.request.method} ${n.request.url}`),n.response&&core.error(`Response body:
 ${JSON.stringify(n.response.data,void 0,2)}`)),n instanceof Error&&(core.error(n.message),n.stack&&core.error(n.stack)),new Error(`Failed to submit snapshot: ${n}`)}}
 
 
@@ -32936,7 +32936,7 @@ function run() {
             core.info(`Dependency Tree:`);
             core.info(`${tree}`);
             // Process Dependabot Alerts
-            const repo = github.context.repo;
+            const repo = lib_github.context.repo;
             // Built in Actions token doesn't have ability to get Dependabot alerts
             // const githubToken = core.getInput('token') || (await core.getIDToken())
             // Get GITHUB_TOKEN from environment variable.  Otherwise pull actions token...
@@ -32947,6 +32947,12 @@ function run() {
             console.log(dependabotAlerts);
             core.info(`Dependabot Alerts:`);
             core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+            // Testing - Print out pull requests
+            const pullRequests = yield listPullRequests(repo, githubToken);
+            console.log(pullRequests);
+            // Testing - print out issues
+            const issues = yield listIssues(repo, githubToken);
+            console.log(issues);
             //await core.summary
             core.summary.addHeading(`Dependencies`);
             //core.summary.addTable([
@@ -33031,7 +33037,7 @@ function buildTree(snapshot, manifestName, pkg, indent) {
 function listDependabotAlerts(repo, token) {
     return src_awaiter(this, void 0, void 0, function* () {
         //const octokit = new Octokit({ auth: token });
-        const octokit = github.getOctokit(token);
+        const octokit = lib_github.getOctokit(token);
         try {
             const alerts = yield octokit.request('GET /repos/{owner}/{repo}/dependabot/alerts', {
                 owner: repo.owner,
@@ -33045,6 +33051,96 @@ function listDependabotAlerts(repo, token) {
         catch (error) {
             console.error(`Failed to fetch Dependabot alerts: ${error}`);
             console.error(`Failed to fetch Dependabot alerts: ${error.message}`);
+            return null;
+        }
+    });
+}
+// Create a function to list pull requests
+function listPullRequests(repo, token) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const octokit = lib_github.getOctokit(token);
+        try {
+            const pulls = yield octokit.request('GET /repos/{owner}/{repo}/pulls', {
+                owner: repo.owner,
+                repo: repo.repo,
+                accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            });
+            //console.log(pulls);
+            return pulls.data;
+        }
+        catch (error) {
+            console.error(`Failed to fetch pull requests: ${error}`);
+            console.error(`Failed to fetch pull requests: ${error.message}`);
+            return null;
+        }
+    });
+}
+// Create a function to list issues
+function listIssues(repo, token) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const octokit = lib_github.getOctokit(token);
+        try {
+            const issues = yield octokit.request('GET /repos/{owner}/{repo}/issues', {
+                owner: repo.owner,
+                repo: repo.repo,
+                accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            });
+            //console.log(issues);
+            return issues.data;
+        }
+        catch (error) {
+            console.error(`Failed to fetch issues: ${error}`);
+            console.error(`Failed to fetch issues: ${error.message}`);
+            return null;
+        }
+    });
+}
+// Create a function to raise a pull request
+function raisePullRequest(repo, token, title, body, head, base) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(token);
+        try {
+            const pr = yield octokit.request('POST /repos/{owner}/{repo}/pulls', {
+                owner: repo.owner,
+                repo: repo.repo,
+                title: title,
+                body: body,
+                head: head,
+                base: base,
+                accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            });
+            //console.log(pr);
+            return pr.data;
+        }
+        catch (error) {
+            console.error(`Failed to raise pull request: ${error}`);
+            console.error(`Failed to raise pull request: ${error.message}`);
+            return null;
+        }
+    });
+}
+// Create a function to raise an issue
+function raiseIssue(repo, token, title, body) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(token);
+        try {
+            const issue = yield octokit.request('POST /repos/{owner}/{repo}/issues', {
+                owner: repo.owner,
+                repo: repo.repo,
+                title: title,
+                body: body,
+                accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            });
+            //console.log(issue);
+            return issue.data;
+        }
+        catch (error) {
+            console.error(`Failed to raise issue: ${error}`);
+            console.error(`Failed to raise issue: ${error.message}`);
             return null;
         }
     });

@@ -6,8 +6,10 @@ import { SnapshotConfig, generateSnapshot } from './snapshot-generator';
 import { Package } from '@github/dependency-submission-toolkit'; // Adjust this import if needed
 
 //import { Octokit } from "@octokit/rest"; // REST API client to pull Dependabot Alerts
+// TODO- Remove     "@octokit/rest": "^20.1.0", from package.json
+
 import * as github from '@actions/github'
-import type { Context } from '@actions/github/lib/context.js'
+import type { Context } from '@actions/github/lib/context.js' // Adjust this import if needed... 
 
 type DependencyRelationship = 'direct' | 'indirect';
 type DependencyScope = 'runtime' | 'development';
@@ -119,6 +121,14 @@ async function run() {
     core.info(`Dependabot Alerts:`)
     core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
 
+    // Testing - Print out pull requests
+    const pullRequests = await listPullRequests(repo, githubToken)
+    console.log(pullRequests)
+
+    // Testing - print out issues
+    const issues = await listIssues(repo, githubToken)
+    console.log(issues)
+
     //await core.summary
     core.summary.addHeading(`Dependencies`);
     //core.summary.addTable([
@@ -226,6 +236,100 @@ async function listDependabotAlerts(repo: any, token: string) {
   } catch (error: any) {
     console.error(`Failed to fetch Dependabot alerts: ${error}`);
     console.error(`Failed to fetch Dependabot alerts: ${error.message}`);
+    return null;
+  }
+}
+
+// Create a function to list pull requests
+async function listPullRequests(repo: any, token: string) {
+  const octokit = github.getOctokit(token);
+
+  try {
+    const pulls = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
+      owner: repo.owner,
+      repo: repo.repo,
+      accept: 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28'
+    });
+
+    //console.log(pulls);
+
+    return pulls.data;
+  } catch (error: any) {
+    console.error(`Failed to fetch pull requests: ${error}`);
+    console.error(`Failed to fetch pull requests: ${error.message}`);
+    return null;
+  }
+}
+
+// Create a function to list issues
+async function listIssues(repo: any, token: string) {
+  const octokit = github.getOctokit(token);
+
+  try {
+    const issues = await octokit.request('GET /repos/{owner}/{repo}/issues', {
+      owner: repo.owner,
+      repo: repo.repo,
+      accept: 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28'
+    });
+
+    //console.log(issues);
+
+    return issues.data;
+  } catch (error: any) {
+    console.error(`Failed to fetch issues: ${error}`);
+    console.error(`Failed to fetch issues: ${error.message}`);
+    return null;
+  }
+}
+
+// Create a function to raise a pull request
+async function raisePullRequest(repo: any, token: string, title: string, body: string, head: string, base: string) {
+  const octokit = github.getOctokit(token);
+
+  try {
+    const pr = await octokit.request('POST /repos/{owner}/{repo}/pulls', {
+      owner: repo.owner,
+      repo: repo.repo,
+      title: title,
+      body: body,
+      head: head,
+      base: base,
+      accept: 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28'
+    });
+
+    //console.log(pr);
+
+    return pr.data;
+  } catch (error: any) {
+    console.error(`Failed to raise pull request: ${error}`);
+    console.error(`Failed to raise pull request: ${error.message}`);
+    return null;
+  }
+}
+
+// Create a function to raise an issue
+async function raiseIssue(repo: any, token: string, title: string, body: string) {
+  const octokit = github.getOctokit(token);
+
+  try {
+    const issue = await octokit.request('POST /repos/{owner}/{repo}/issues', {
+      owner: repo.owner,
+      repo: repo.repo,
+      title: title,
+      body: body,
+      accept: 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28'
+    });
+
+    //console.log(issue);
+
+    return issue.data;
+  } catch (error: any) {
+    console.error(`Failed to raise issue: ${error}`);
+    console.error(`Failed to raise issue: ${error.message}`);
     return null;
   }
 }
