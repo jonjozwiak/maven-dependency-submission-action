@@ -33052,6 +33052,7 @@ function buildTree(snapshot, manifestName, pkg, indent, parent = null) {
         if (result) {
             tree += result.tree;
             //packageJsonArray = packageJsonArray.concat(result.packageJson);
+            console.log("result: ", result.packageJson);
             packageJsonArray.push(result.packageJson);
         }
     }

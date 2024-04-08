@@ -239,6 +239,7 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number, parent: str
     if (result) {
       tree += result.tree;
       //packageJsonArray = packageJsonArray.concat(result.packageJson);
+      console.log("result: ", result.packageJson);
       packageJsonArray.push(result.packageJson);
     }
   }
