@@ -112,7 +112,7 @@ async function run() {
     // TODO - Add some error handling to ensure token has necessary access?
 
     core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`)
-    const dependabotAlerts = listDependabotAlerts(repo, githubToken)
+    const dependabotAlerts = await listDependabotAlerts(repo, githubToken)
 
     console.log(dependabotAlerts)
 

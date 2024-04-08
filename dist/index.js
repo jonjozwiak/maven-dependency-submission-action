@@ -32943,7 +32943,7 @@ function run() {
             const githubToken = process.env.GITHUB_TOKEN || core.getInput('token') || (yield core.getIDToken());
             // TODO - Add some error handling to ensure token has necessary access?
             core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`);
-            const dependabotAlerts = listDependabotAlerts(repo, githubToken);
+            const dependabotAlerts = yield listDependabotAlerts(repo, githubToken);
             console.log(dependabotAlerts);
             core.info(`Dependabot Alerts:`);
             core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
