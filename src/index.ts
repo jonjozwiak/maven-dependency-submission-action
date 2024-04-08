@@ -114,6 +114,8 @@ async function run() {
     core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`)
     const dependabotAlerts = listDependabotAlerts(repo, githubToken)
 
+    console.log(dependabotAlerts)
+
     core.info(`Dependabot Alerts:`)
     core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
 
@@ -218,8 +220,8 @@ async function listDependabotAlerts(repo: any, token: string) {
               'X-GitHub-Api-Version': '2022-11-28'
     });
 
-    console.log(alerts);
-    
+    //console.log(alerts);
+
     return alerts.data;
   } catch (error: any) {
     console.error(`Failed to fetch Dependabot alerts: ${error}`);

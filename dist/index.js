@@ -32944,6 +32944,7 @@ function run() {
             // TODO - Add some error handling to ensure token has necessary access?
             core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`);
             const dependabotAlerts = listDependabotAlerts(repo, githubToken);
+            console.log(dependabotAlerts);
             core.info(`Dependabot Alerts:`);
             core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
             //await core.summary
@@ -33038,7 +33039,7 @@ function listDependabotAlerts(repo, token) {
                 accept: 'application/vnd.github+json',
                 'X-GitHub-Api-Version': '2022-11-28'
             });
-            console.log(alerts);
+            //console.log(alerts);
             return alerts.data;
         }
         catch (error) {
