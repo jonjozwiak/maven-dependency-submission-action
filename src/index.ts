@@ -103,8 +103,14 @@ async function run() {
 
     // Process Dependabot Alerts
     const repo = github.context.repo;
-    const githubToken = core.getInput('token') || (await core.getIDToken())
+    // Built in Actions token doesn't have ability to get Dependabot alerts
+    // const githubToken = core.getInput('token') || (await core.getIDToken())
 
+    // Get GITHUB_TOKEN from environment variable.  Otherwise pull actions token...
+    const githubToken = process.env.GITHUB_TOKEN || core.getInput('token') || (await core.getIDToken())
+
+    // TODO - Add some error handling to ensure token has necessary access?
+    
     core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`)
     const dependabotAlerts = listDependabotAlerts(repo, githubToken)
 
@@ -197,6 +203,9 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number): string {
 
 // TODO - Obviously dependabot alerts are not going to exist before the snapshot is submitted
 // I need to split this into a separate action if this is going to be useful... just testing...
+
+// Note - A default token can't access Dependabot Alerts API for the repo.
+// https://github.com/orgs/community/discussions/60612
 async function listDependabotAlerts(repo: any, token: string) {
   //const octokit = new Octokit({ auth: token });
   const octokit = github.getOctokit(token);
