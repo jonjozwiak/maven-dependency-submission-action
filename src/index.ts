@@ -212,6 +212,8 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number, parent: str
     parent: parent
   };
 
+  console.log(packageJson);
+
   packageJsonArray.push(packageJson);
 
   for (const dependencyUrl of pkg.depPackage.dependencies) {
