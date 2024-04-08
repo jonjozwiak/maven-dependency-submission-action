@@ -32852,6 +32852,7 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 //import { Octokit } from "@octokit/rest"; // REST API client to pull Dependabot Alerts
+// TODO- Remove     "@octokit/rest": "^20.1.0", from package.json
 
 /*
 class Dependency {
@@ -32906,7 +32907,7 @@ function run() {
             external_fs_.writeFileSync('dependencySnapshot.json', JSON.stringify(snapshot));
             // Write dependency tree as output
             let tree = '';
-            // TODO - Remove hardcoded manifest name
+            let treeJson = [];
             for (const manifestName in snapshot.manifests) {
                 for (const packageUrl in snapshot.manifests[manifestName].resolved) {
                     const pkg = snapshot.manifests[manifestName].resolved[packageUrl];
@@ -32928,13 +32929,19 @@ function run() {
                     //  //core.debug(`Dep Qualifiers type stringify - ${JSON.stringify(dependencyUrl.qualifiers.type, null, 2)}`)
                     //}
                     if (pkg.relationship === 'direct') {
-                        //tree += buildTree(snapshot, packageUrl, 0);
-                        tree += buildTree(snapshot, manifestName, pkg, 0);
+                        //tree += buildTree(snapshot, manifestName, pkg, 0);
+                        const result = buildTree(snapshot, manifestName, pkg, 0);
+                        if (result) {
+                            tree += result.tree;
+                            treeJson.push(result.packageJson);
+                        }
                     }
                 }
             }
             core.info(`Dependency Tree:`);
             core.info(`${tree}`);
+            core.info(`Dependency Tree JSON:`);
+            core.info(JSON.stringify(treeJson, null, 2));
             // Process Dependabot Alerts
             const repo = lib_github.context.repo;
             // Built in Actions token doesn't have ability to get Dependabot alerts
@@ -32944,15 +32951,15 @@ function run() {
             // TODO - Add some error handling to ensure token has necessary access?
             core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`);
             const dependabotAlerts = yield listDependabotAlerts(repo, githubToken);
-            console.log(dependabotAlerts);
-            core.info(`Dependabot Alerts:`);
-            core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+            //console.log(dependabotAlerts)
+            //core.info(`Dependabot Alerts:`)
+            //core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
             // Testing - Print out pull requests
             const pullRequests = yield listPullRequests(repo, githubToken);
-            console.log(pullRequests);
+            //console.log(pullRequests)
             // Testing - print out issues
             const issues = yield listIssues(repo, githubToken);
-            console.log(issues);
+            //console.log(issues)
             //await core.summary
             core.summary.addHeading(`Dependencies`);
             //core.summary.addTable([
@@ -32977,7 +32984,8 @@ function run() {
     });
 }
 // Note - this should be moved to a separate file
-function buildTree(snapshot, manifestName, pkg, indent) {
+//function buildTree(snapshot: any, manifestName, pkg, indent: number): string {
+function buildTree(snapshot, manifestName, pkg, indent, parent = null) {
     //console.log(pkg);
     //core.debug(`Building tree for ${pkg.depPackage.packageURL}`)
     //const pkg = snapshot.manifests[manifestName].resolved[packageUrl];
@@ -33008,6 +33016,19 @@ function buildTree(snapshot, manifestName, pkg, indent) {
     //  core.debug(`pkg.depPackage.packageURL - ${dependencyUrl.packageURL}`)
     //  core.debug(`pkg.depPackage.packageURL stringify - ${JSON.stringify(dependencyUrl.packageURL, null, 2)}`)
     //}
+    //let packageJsonArray = [];
+    let packageJsonArray = [];
+    let packageJson = {
+        package_url: pkg.depPackage.packageURL,
+        name: pkg.depPackage.packageURL.name,
+        namespace: pkg.depPackage.packageURL.namespace,
+        type: pkg.depPackage.packageURL.type,
+        version: pkg.depPackage.packageURL.version,
+        relationship: pkg.relationship,
+        scope: pkg.scope,
+        parent: parent
+    };
+    packageJsonArray.push(packageJson);
     for (const dependencyUrl of pkg.depPackage.dependencies) {
         //console.log(dependencyUrl);
         //core.debug(`Dependency URL - ${dependencyUrl}`)
@@ -33025,10 +33046,16 @@ function buildTree(snapshot, manifestName, pkg, indent) {
         core.debug(`Calling buildtree for dependency ${myDep}`);
         //core.debug(`Note pkg - ${JSON.stringify(pkg)} and dependencyUrl - ${JSON.stringify(dependencyUrl)}`)
         //tree += buildTree(snapshot, dependencyUrl.packageURL, indent + 2);
-        tree += buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2);
+        //tree += buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2, pkg.depPackage.packageURL);
+        const result = buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2, pkg.depPackage.packageURL);
+        if (result) {
+            tree += result.tree;
+            packageJsonArray = packageJsonArray.concat(result.packageJson);
+        }
     }
     //}
-    return tree;
+    //return tree;
+    return { tree, packageJson };
 }
 // TODO - Obviously dependabot alerts are not going to exist before the snapshot is submitted
 // I need to split this into a separate action if this is going to be useful... just testing...
