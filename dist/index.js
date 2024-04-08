@@ -33038,6 +33038,7 @@ function listDependabotAlerts(repo, token) {
                 accept: 'application/vnd.github+json',
                 'X-GitHub-Api-Version': '2022-11-28'
             });
+            console.log(alerts);
             return alerts.data;
         }
         catch (error) {

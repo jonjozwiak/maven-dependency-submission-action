@@ -110,7 +110,7 @@ async function run() {
     const githubToken = process.env.GITHUB_TOKEN || core.getInput('token') || (await core.getIDToken())
 
     // TODO - Add some error handling to ensure token has necessary access?
-    
+
     core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`)
     const dependabotAlerts = listDependabotAlerts(repo, githubToken)
 
@@ -218,6 +218,8 @@ async function listDependabotAlerts(repo: any, token: string) {
               'X-GitHub-Api-Version': '2022-11-28'
     });
 
+    console.log(alerts);
+    
     return alerts.data;
   } catch (error: any) {
     console.error(`Failed to fetch Dependabot alerts: ${error}`);
