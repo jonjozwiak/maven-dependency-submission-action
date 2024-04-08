@@ -212,7 +212,7 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number, parent: str
     parent: parent
   };
 
-  console.log(packageJson);
+  //console.log(packageJson);
 
   packageJsonArray.push(packageJson);
 
@@ -238,7 +238,8 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number, parent: str
     const result = buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2, pkg.depPackage.packageURL);
     if (result) {
       tree += result.tree;
-      packageJsonArray = packageJsonArray.concat(result.packageJson);
+      //packageJsonArray = packageJsonArray.concat(result.packageJson);
+      packageJsonArray.push(result.packageJson);
     }
   }
   //}

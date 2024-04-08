@@ -33028,7 +33028,7 @@ function buildTree(snapshot, manifestName, pkg, indent, parent = null) {
         scope: pkg.scope,
         parent: parent
     };
-    console.log(packageJson);
+    //console.log(packageJson);
     packageJsonArray.push(packageJson);
     for (const dependencyUrl of pkg.depPackage.dependencies) {
         //console.log(dependencyUrl);
@@ -33051,7 +33051,8 @@ function buildTree(snapshot, manifestName, pkg, indent, parent = null) {
         const result = buildTree(snapshot, manifestName, snapshot.manifests[manifestName].resolved[myDep], indent + 2, pkg.depPackage.packageURL);
         if (result) {
             tree += result.tree;
-            packageJsonArray = packageJsonArray.concat(result.packageJson);
+            //packageJsonArray = packageJsonArray.concat(result.packageJson);
+            packageJsonArray.push(result.packageJson);
         }
     }
     //}
