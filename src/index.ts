@@ -99,7 +99,7 @@ async function run() {
           const result = buildTree(snapshot, manifestName, pkg, 0);
           if (result) {
             tree += result.tree;
-            treeJson.push(result.packageJson);
+            treeJson.push(...result.packageJson);
           }
         }
       }
@@ -239,13 +239,14 @@ function buildTree(snapshot: any, manifestName, pkg, indent: number, parent: str
     if (result) {
       tree += result.tree;
       //packageJsonArray = packageJsonArray.concat(result.packageJson);
-      console.log("result: ", result.packageJson);
-      packageJsonArray.push(result.packageJson);
+      //console.log("result: ", result.packageJson);
+      packageJsonArray.push(...result.packageJson);
     }
   }
   //}
   //return tree;
-  return { tree, packageJson };
+  //return { tree, packageJson };
+  return { tree, packageJson: packageJsonArray };
 }
 
 // TODO - Obviously dependabot alerts are not going to exist before the snapshot is submitted
