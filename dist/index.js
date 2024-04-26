@@ -36462,7 +36462,7 @@ function identifyIndirectUpdates(dependencyTree) {
                     });
                     console.log(`Child exists: ${childExists}`);
                     // If child does not exist in childrenMap[parentKey], add it
-                    if (!childExists) {
+                    if (childExists) {
                         childrenMap[parentKey].push(Object.assign(Object.assign({}, child), { depth: child.depth + 1 }));
                         hasChildren = true;
                     }

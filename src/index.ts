@@ -374,12 +374,13 @@ function identifyIndirectUpdates(dependencyTree: any[]): any[] {
     for (const parentKey in childrenMap) {
       console.log(`Parent key: ${parentKey}`);
 
+      // For each child of a parent, check if it has children
       for (const child of childrenMap[parentKey]) {
         const childKey = `${child.type}:${child.namespace}:${child.name}:${child.version}`;
         console.log(`Child key: ${childKey}, Child depth: ${child.depth}`);
 
         if (childrenMap[childKey]) {
-          // Check if child already exists in childrenMap[parentKey]
+          // Check if child already exists in childrenMap[parentKey] - It only will if it has children
           const childExists = childrenMap[parentKey].some((existingChild: any) => {
             const existingChildKey = `${existingChild.type}:${existingChild.namespace}:${existingChild.name}:${existingChild.version}`;
             console.log(`Existing Child key: ${existingChildKey}, Child key: ${childKey}`);
@@ -388,8 +389,8 @@ function identifyIndirectUpdates(dependencyTree: any[]): any[] {
 
           console.log(`Child exists: ${childExists}`);
 
-          // If child does not exist in childrenMap[parentKey], add it
-          if (!childExists) {
+          // If child has children - add to childrenMap[parentKey]
+          if (childExists) {
             childrenMap[parentKey].push({
               ...child,
               depth: child.depth + 1
