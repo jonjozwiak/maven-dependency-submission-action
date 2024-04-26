@@ -25,8 +25,11 @@
     "@actions/exec": "^1.1.1",
     "@github/dependency-submission-toolkit": "^2.0.4",
     "@octokit/rest": "^20.1.0",
+    "axios": "^1.6.8",
     "commander": "^9.4.0",
-    "packageurl-js": "^1.2.0"
+    "packageurl-js": "^1.2.0",
+    "semver": "^7.6.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",

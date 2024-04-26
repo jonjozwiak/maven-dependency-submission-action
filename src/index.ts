@@ -11,6 +11,11 @@ import { Package } from '@github/dependency-submission-toolkit'; // Adjust this 
 import * as github from '@actions/github'
 import type { Context } from '@actions/github/lib/context.js' // Adjust this import if needed...
 
+// Imports for Maven Package Calls and semantic versioning
+import axios from 'axios';
+import * as xml2js from 'xml2js';
+import * as semver from 'semver';
+
 type DependencyRelationship = 'direct' | 'indirect';
 type DependencyScope = 'runtime' | 'development';
 
@@ -286,18 +291,89 @@ function associateAlerts(dependencyTree: any[], alerts: any[]): any[] {
 
   for (const pkg of dependencyTree) {
     pkg.alerts = [];
+    pkg.patched_version = '0.0.0'; // Initialize to a low version
 
+    // TODO - Filter out closed / dismissed alerts
     for (const alert of alerts) {
       if (alert.dependency.package.name === `${pkg.package_url.namespace}:${pkg.package_url.name}`) {
         pkg.alerts.push(alert);
+
+        // If the first_patched_version is higher than the current patched_version, update it
+        if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.latestNeededVersion)) {
+          pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+        }
       }
     }
 
+    if (pkg.patched_version === '0.0.0') {
+      delete pkg.patched_version;
+    }
     associatedPackages.push(pkg);
   }
 
   return associatedPackages;
 }
+
+// TODO - semver.compare(b.name, a.name);  Semantic versioning comparison??
+
+//TODO - Update this to allow for a specific version?
+// TODO - Update this to allow a different package manager
+//TODO - Update this to get a specific version? Or just use the latest?
+/* async function getLatestVersionMaven(packageNamespace: string, packageName: string, maxRetries = 3) {
+  const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/maven-metadata.xml`;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await axios.get(url);
+      const result = await xml2js.parseStringPromise(response.data);
+      const latestVersion = result.metadata.versioning[0].latest[0];
+
+      return latestVersion;
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed to fetch Maven metadata: ${error}`);
+      if (i < maxRetries - 1) {
+        // Wait for 1 second before the next attempt
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        return null;
+      }
+    }
+  }
+}
+
+async function getLatestMinorVersionMaven(packageNamespace: string, packageName: string, maxRetries = 3) {
+  const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/maven-metadata.xml`;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await axios.get(url);
+      const result = await xml2js.parseStringPromise(response.data);
+      const versions = result.metadata.versioning[0].versions[0].version;
+
+      // Get the latest version
+      const latestVersion = semver.maxSatisfying(versions, '*');
+
+      // Filter out the versions that have the same major version as the latest version
+      const sameMajorVersions = versions.filter(version => semver.major(version) === semver.major(latestVersion));
+
+      // Get the latest minor version
+      const latestMinorVersion = semver.maxSatisfying(sameMajorVersions, `${semver.major(latestVersion)}.*`);
+
+      return latestMinorVersion;
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed to fetch Maven metadata: ${error}`);
+      if (i < maxRetries - 1) {
+        // Wait for 1 second before the next attempt
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        return null;
+      }
+    }
+  }
+}
+*/
+// TODO - Add a check if the new version also is vulnerable...
+
 
 // Create a function to list pull requests
 async function listPullRequests(repo: any, token: string) {
