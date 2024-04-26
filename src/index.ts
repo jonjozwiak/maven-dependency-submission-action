@@ -301,8 +301,17 @@ function associateAlerts(dependencyTree: any[], alerts: any[]): any[] {
         // If the first_patched_version is higher than the current patched_version, update it
         if ( alert.security_vulnerability.first_patched_version ) {
           if (alert.security_vulnerability.first_patched_version.identifier) {
-            if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.patched_version)) {
-              pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+            if (semver.valid(alert.security_vulnerability.first_patched_version.identifier) && semver.valid(pkg.patched_version)) {
+              if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.patched_version)) {
+                pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+              }
+            } else {
+              // Fallback to numerical comparison
+              let alertVersion = parseFloat(alert.security_vulnerability.first_patched_version.identifier);
+              let pkgVersion = parseFloat(pkg.patched_version);
+              if (!isNaN(alertVersion) && !isNaN(pkgVersion) && alertVersion > pkgVersion) {
+                pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+              }
             }
           } else {
             console.log('No identifier for first_patched_version: ', alert.security_vulnerability.first_patched_version)
