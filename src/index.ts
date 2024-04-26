@@ -138,6 +138,12 @@ async function run() {
     core.info(`Tree with Dependabot Alerts:`)
     core.info(`${JSON.stringify(treeJsonWithDependabot, null, 2)}`);
 
+    // Identify direct dependency updates for remediate indirect dependencies
+    const treeJsonWithIndirectUpdates = identifyIndirectUpdates(treeJsonWithDependabot);
+
+    core.info(`Tree with Dependabot Alerts and Children:`)
+    core.info(`${JSON.stringify(treeJsonWithDependabot, null, 2)}`);
+
     // Testing - Print out pull requests
     const pullRequests = await listPullRequests(repo, githubToken)
     //console.log(pullRequests)
@@ -331,7 +337,78 @@ function associateAlerts(dependencyTree: any[], alerts: any[]): any[] {
   return associatedPackages;
 }
 
-// TODO - semver.compare(b.name, a.name);  Semantic versioning comparison??
+function identifyIndirectUpdates(dependencyTree: any[]): any[] {
+  const childrenMap: { [key: string]: any[] } = {};
+
+  // Map first level of children to their parents
+  for (const pkg of dependencyTree) {
+    if (pkg.parent === null) {
+      const packageKey = `${pkg.type}:${pkg.namespace}:${pkg.name}:${pkg.version}`;
+      if (!childrenMap[packageKey]) {
+        childrenMap[packageKey] = [];
+      }
+    } else {
+      const parentKey = `${pkg.parent.type}:${pkg.parent.namespace}:${pkg.parent.name}:${pkg.parent.version}`;
+      if (!childrenMap[parentKey]) {
+        childrenMap[parentKey] = [];
+      }
+      pkg.depth = 1;
+      childrenMap[parentKey].push(pkg);
+    }
+  }
+
+  // Interate through childrenMap to build the full tree (any depth of children)
+  let hasChildren = true;
+  let loopCount = 0;
+  while (hasChildren) {
+    hasChildren = false;
+    loopCount++;
+
+    if (loopCount > 20) {
+      console.log('Exceeded 20 iterations building dependency tree, exiting loop.');
+      break;
+    }
+
+    for (const parentKey in childrenMap) {
+      for (const child of childrenMap[parentKey]) {
+        const childKey = `${child.type}:${child.namespace}:${child.name}:${child.version}`;
+        if (childrenMap[childKey]) {
+          // Check if child already exists in childrenMap[parentKey]
+          const childExists = childrenMap[parentKey].some((existingChild: any) => {
+            const existingChildKey = `${existingChild.type}:${existingChild.namespace}:${existingChild.name}:${existingChild.version}`;
+            return existingChildKey === childKey;
+          });
+
+          // If child does not exist in childrenMap[parentKey], add it
+          if (!childExists) {
+            childrenMap[parentKey].push({
+              ...child,
+              depth: child.depth + 1
+            });
+            hasChildren = true;
+          }
+        }
+      }
+    }
+  }
+
+  console.log('childrenMap: ', childrenMap);
+
+  // Add children to parent packages
+  const result: any[] = [];
+
+  for (const pkg of dependencyTree) {
+    // If childrenMap[pkg] exists, add it as a child field
+    const packageKey = `${pkg.type}:${pkg.namespace}:${pkg.name}:${pkg.version}`;
+    if (childrenMap[packageKey]) {
+      pkg.children = childrenMap[packageKey];
+    }
+    result.push(pkg);
+  }
+
+  return result;
+}
+
 
 //TODO - Update this to allow for a specific version?
 // TODO - Update this to allow a different package manager
