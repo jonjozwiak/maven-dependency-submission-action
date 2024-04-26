@@ -366,8 +366,8 @@ function identifyIndirectUpdates(dependencyTree: any[]): any[] {
 
     console.log(`Loop count: ${loopCount}`);
 
-    if (loopCount > 20) {
-      console.log('Exceeded 20 iterations building dependency tree, exiting loop.');
+    if (loopCount > 5) {
+      console.log('Exceeded 5 iterations building dependency tree, exiting loop.');
       break;
     }
 
@@ -377,25 +377,37 @@ function identifyIndirectUpdates(dependencyTree: any[]): any[] {
       // For each child of a parent, check if it has children
       for (const child of childrenMap[parentKey]) {
         const childKey = `${child.type}:${child.namespace}:${child.name}:${child.version}`;
-        console.log(`Child key: ${childKey}, Child depth: ${child.depth}`);
+        //console.log(`Child key: ${childKey}, Child depth: ${child.depth}`);
 
         if (childrenMap[childKey]) {
-          // Check if child already exists in childrenMap[parentKey] - It only will if it has children
-          const childExists = childrenMap[parentKey].some((existingChild: any) => {
-            const existingChildKey = `${existingChild.type}:${existingChild.namespace}:${existingChild.name}:${existingChild.version}`;
-            console.log(`Existing Child key: ${existingChildKey}, Child key: ${childKey}`);
-            return existingChildKey === childKey;
-          });
+          // Check if each child already exists in childrenMap[parentKey]
+          for (const child2 of childrenMap[childKey]) {
+            const child2NoDepth = { ...child2 };
+            delete child2NoDepth.depth;
 
-          console.log(`Child exists: ${childExists}`);
+            const childExists = childrenMap[parentKey].some((existingChild: any) => {
+              const existingChildNoDepth = { ...existingChild };
+              delete existingChildNoDepth.depth;
 
-          // If child has children - add to childrenMap[parentKey]
-          if (childExists) {
-            childrenMap[parentKey].push({
-              ...child,
-              depth: child.depth + 1
+              return JSON.stringify(existingChildNoDepth) === JSON.stringify(child2NoDepth);
             });
-            hasChildren = true;
+
+            //const childExists = childrenMap[parentKey].some((existingChild: any) => {
+            //  const existingChildKey = `${existingChild.type}:${existingChild.namespace}:${existingChild.name}:${existingChild.version}`;
+            //  console.log(`Existing Child key: ${existingChildKey}, Child key: ${childKey}`);
+            //  return existingChildKey === childKey;
+            //});
+
+            console.log(`Child exists: ${childExists}`);
+
+            // If child does not exist in childrenMap[parentKey], add it
+            if (!childExists) {
+              childrenMap[parentKey].push({
+                ...child2,
+                depth: child2.depth + 1
+              });
+              hasChildren = true;
+            }
           }
         }
       }
