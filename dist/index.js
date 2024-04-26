@@ -32952,8 +32952,8 @@ function run() {
             core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`);
             const dependabotAlerts = yield listDependabotAlerts(repo, githubToken);
             //console.log(dependabotAlerts)
-            //core.info(`Dependabot Alerts:`)
-            //core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+            core.info(`Dependabot Alerts:`);
+            core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
             // Testing - Print out pull requests
             const pullRequests = yield listPullRequests(repo, githubToken);
             //console.log(pullRequests)

@@ -125,8 +125,8 @@ async function run() {
 
     //console.log(dependabotAlerts)
 
-    //core.info(`Dependabot Alerts:`)
-    //core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+    core.info(`Dependabot Alerts:`)
+    core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
 
     // Testing - Print out pull requests
     const pullRequests = await listPullRequests(repo, githubToken)
