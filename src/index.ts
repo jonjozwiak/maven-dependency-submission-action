@@ -299,8 +299,12 @@ function associateAlerts(dependencyTree: any[], alerts: any[]): any[] {
         pkg.alerts.push(alert);
 
         // If the first_patched_version is higher than the current patched_version, update it
-        if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.latestNeededVersion)) {
-          pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+        if ( alert.security_vulnerability.first_patched_version ) {
+          if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.latestNeededVersion)) {
+            pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+          }
+        } else {
+          pkg.patched_version = 'none';
         }
       }
     }

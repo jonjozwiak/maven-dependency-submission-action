@@ -36382,8 +36382,13 @@ function associateAlerts(dependencyTree, alerts) {
             if (alert.dependency.package.name === `${pkg.package_url.namespace}:${pkg.package_url.name}`) {
                 pkg.alerts.push(alert);
                 // If the first_patched_version is higher than the current patched_version, update it
-                if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.latestNeededVersion)) {
-                    pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+                if (alert.security_vulnerability.first_patched_version) {
+                    if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.latestNeededVersion)) {
+                        pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
+                    }
+                }
+                else {
+                    pkg.patched_version = 'none';
                 }
             }
         }
