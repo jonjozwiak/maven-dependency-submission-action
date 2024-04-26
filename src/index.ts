@@ -104,11 +104,11 @@ async function run() {
         }
       }
     }
-    core.info(`Dependency Tree:`)
-    core.info(`${tree}`);
+    core.debug(`Dependency Tree:`)
+    core.debug(`${tree}`);
 
-    core.info(`Dependency Tree JSON:`)
-    core.info(JSON.stringify(treeJson, null, 2));
+    core.debug(`Dependency Tree JSON:`)
+    core.debug(JSON.stringify(treeJson, null, 2));
 
     // Process Dependabot Alerts
     const repo = github.context.repo;
@@ -125,8 +125,13 @@ async function run() {
 
     //console.log(dependabotAlerts)
 
-    core.info(`Dependabot Alerts:`)
-    core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+    core.debug(`Dependabot Alerts:`)
+    core.debug(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+
+    // Associate Dependabot Alerts with the dependency tree
+    const treeJsonWithDependabot = associateAlerts(treeJson, dependabotAlerts || []);
+    core.info(`Tree with Dependabot Alerts:`)
+    core.info(`${JSON.stringify(treeJsonWithDependabot, null, 2)}`);
 
     // Testing - Print out pull requests
     const pullRequests = await listPullRequests(repo, githubToken)
@@ -274,6 +279,24 @@ async function listDependabotAlerts(repo: any, token: string) {
     console.error(`Failed to fetch Dependabot alerts: ${error.message}`);
     return null;
   }
+}
+
+function associateAlerts(dependencyTree: any[], alerts: any[]): any[] {
+  const associatedPackages: any[] = [];
+
+  for (const pkg of dependencyTree) {
+    pkg.alerts = [];
+
+    for (const alert of alerts) {
+      if (alert.dependency.package.name === `${pkg.package_url.namespace}:${pkg.package_url.name}`) {
+        pkg.alerts.push(alert);
+      }
+    }
+
+    associatedPackages.push(pkg);
+  }
+
+  return associatedPackages;
 }
 
 // Create a function to list pull requests

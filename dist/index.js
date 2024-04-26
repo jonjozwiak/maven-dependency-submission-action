@@ -32938,10 +32938,10 @@ function run() {
                     }
                 }
             }
-            core.info(`Dependency Tree:`);
-            core.info(`${tree}`);
-            core.info(`Dependency Tree JSON:`);
-            core.info(JSON.stringify(treeJson, null, 2));
+            core.debug(`Dependency Tree:`);
+            core.debug(`${tree}`);
+            core.debug(`Dependency Tree JSON:`);
+            core.debug(JSON.stringify(treeJson, null, 2));
             // Process Dependabot Alerts
             const repo = lib_github.context.repo;
             // Built in Actions token doesn't have ability to get Dependabot alerts
@@ -32952,8 +32952,12 @@ function run() {
             core.info(`Owner: ${repo.owner}, Repo: ${repo.repo}, Token: ${githubToken}`);
             const dependabotAlerts = yield listDependabotAlerts(repo, githubToken);
             //console.log(dependabotAlerts)
-            core.info(`Dependabot Alerts:`);
-            core.info(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+            core.debug(`Dependabot Alerts:`);
+            core.debug(`${JSON.stringify(dependabotAlerts, null, 2)}`);
+            // Associate Dependabot Alerts with the dependency tree
+            const treeJsonWithDependabot = associateAlerts(treeJson, dependabotAlerts || []);
+            core.info(`Tree with Dependabot Alerts:`);
+            core.info(`${JSON.stringify(treeJsonWithDependabot, null, 2)}`);
             // Testing - Print out pull requests
             const pullRequests = yield listPullRequests(repo, githubToken);
             //console.log(pullRequests)
@@ -33085,6 +33089,19 @@ function listDependabotAlerts(repo, token) {
             return null;
         }
     });
+}
+function associateAlerts(dependencyTree, alerts) {
+    const associatedPackages = [];
+    for (const pkg of dependencyTree) {
+        pkg.alerts = [];
+        for (const alert of alerts) {
+            if (alert.dependency.package.name === `${pkg.package_url.namespace}:${pkg.package_url.name}`) {
+                pkg.alerts.push(alert);
+            }
+        }
+        associatedPackages.push(pkg);
+    }
+    return associatedPackages;
 }
 // Create a function to list pull requests
 function listPullRequests(repo, token) {
