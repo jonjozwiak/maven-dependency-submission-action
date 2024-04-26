@@ -301,7 +301,7 @@ function associateAlerts(dependencyTree: any[], alerts: any[]): any[] {
         // If the first_patched_version is higher than the current patched_version, update it
         if ( alert.security_vulnerability.first_patched_version ) {
           if (alert.security_vulnerability.first_patched_version.identifier) {
-            if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.latestNeededVersion)) {
+            if (semver.gt(alert.security_vulnerability.first_patched_version.identifier, pkg.patched_version)) {
               pkg.patched_version = alert.security_vulnerability.first_patched_version.identifier;
             }
           } else {
