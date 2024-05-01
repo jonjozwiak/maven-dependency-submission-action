@@ -36543,14 +36543,19 @@ function identifyUpdatePlan(dependencyTree) {
                         // If the alert is the package itself, we can update the package
                         console.info(`Processing package: ${alert.namespace}:${alert.name}:${alert.version}`);
                         if (alert.depth === 0) {
-                            // TODO: Add some logic to determine the update version
-                            pkg.update = true;
+                            // TODO - Step 2 - Have this compare the child_patched_version to patched_version (and use the newer of the two)
                             console.info(`  - Depth 0 update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
                         }
                         else {
                             // If the alert is a child, we need to identify the update for the parent first
                             console.info(`  - Child to update: ${alert.namespace}:${alert.name}:${alert.version} -- To Version: ${alert.patched_version}`);
-                            console.info(`  - Parent to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
+                            console.info(`  - Parent to update: ${alert.parent.namespace}:${alert.parent.name}:${alert.parent.version}` + (alert.parent.patched_version ? ` -- To Version: ${alert.parent.patched_version}` : ''));
+                            console.info(`  - Direct Dependency to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
+                            // TODO - This isn't quite right.  This will find the depth 0 parent (ie direct dependency)
+                            // It will not find the parent of the child (if we're at depth 2 or more)
+                            // We need to find the parent of the child.  (i.e. alert.parent)
+                            // Then we need to search for potential package updates and reach out to maven to find which parent version includes our child version
+                            // Need to ensure retries and exponential backoff for the maven call
                         }
                     }
                 }
