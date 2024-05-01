@@ -36532,7 +36532,8 @@ function identifyUpdatePlan(dependencyTree) {
                 // Iterate over each depth
                 for (const depth of depths) {
                     const alertsAtDepth = alertsByDepth[depth];
-                    core.info(`Processing alerts at depth ${depth}: ${JSON.stringify(alertsAtDepth)}`);
+                    //core.info(`Processing alerts at depth ${depth}: ${JSON.stringify(alertsAtDepth)}`);
+                    core.info(`Processing alerts at depth ${depth}`);
                     // Iterate over each alert at this depth
                     for (const alert of alertsAtDepth) {
                         // If the alert is the package itself, we can update the package

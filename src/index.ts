@@ -483,7 +483,8 @@ function identifyUpdatePlan(dependencyTree: any[]): any[] {
         for (const depth of depths) {
           const alertsAtDepth = alertsByDepth[depth];
 
-          core.info(`Processing alerts at depth ${depth}: ${JSON.stringify(alertsAtDepth)}`);
+          //core.info(`Processing alerts at depth ${depth}: ${JSON.stringify(alertsAtDepth)}`);
+          core.info(`Processing alerts at depth ${depth}`);
 
           // Iterate over each alert at this depth
           for (const alert of alertsAtDepth) {
