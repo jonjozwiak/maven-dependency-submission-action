@@ -36519,6 +36519,10 @@ function identifyUpdatePlan(dependencyTree) {
             if (alerts.length > 0) {
                 // Sort alerts by depth in descending order
                 alerts.sort((a, b) => b.depth - a.depth);
+                // print each alerts namespace, name, version, and depth
+                for (const alert of alerts) {
+                    console.log(`Alert: ${alert.namespace}:${alert.name}:${alert.version} at depth ${alert.depth}`);
+                }
                 // Group alerts by depth
                 const alertsByDepth = alerts.reduce((groups, alert) => {
                     if (!groups[alert.depth]) {
