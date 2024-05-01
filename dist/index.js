@@ -36542,7 +36542,8 @@ function identifyUpdatePlan(dependencyTree) {
                         }
                         else {
                             // If the alert is a child, we need to identify the update for the parent first
-                            console.info(`Child to update: ${JSON.stringify(alert)}`);
+                            console.info(`Child to update: ${alert.namespace}:${alert.name}:${alert.version} -- To Version: ${alert.patched_version}`);
+                            console.info(`Parent to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
                         }
                     }
                 }
