@@ -493,9 +493,7 @@ function identifyUpdatePlan(dependencyTree: any[]): any[] {
               pkg.update = true;
             } else {
               // If the alert is a child, we need to identify the update for the parent first
-              const childToUpdate = pkg.children.find((child: any) => child.name === alert.name);
-              console.info(`Child to update: ${JSON.stringify(childToUpdate)}`);
-              childToUpdate.update = true;
+              console.info(`Child to update: ${JSON.stringify(alert)}`);
             }
           }
         }
