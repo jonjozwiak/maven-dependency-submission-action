@@ -36240,10 +36240,14 @@ function run() {
             const treeJsonWithDependabot = associateAlerts(treeJson, dependabotAlerts || []);
             //core.info(`Tree with Dependabot Alerts:`)
             //core.info(`${JSON.stringify(treeJsonWithDependabot, null, 2)}`);
-            // Identify direct dependency updates for remediate indirect dependencies
-            const treeJsonWithIndirectUpdates = identifyIndirectUpdates(treeJsonWithDependabot);
-            //core.info(`Tree with Dependabot Alerts and Children:`)
-            //core.info(`${JSON.stringify(treeJsonWithDependabot, null, 2)}`);
+            // Add children to their parents for easier processing
+            const treeJsonWithChildren = mapChildrenToParents(treeJsonWithDependabot);
+            core.info(`Tree with Dependabot Alerts and Children:`);
+            core.info(`${JSON.stringify(treeJsonWithChildren, null, 2)}`);
+            // Identify update plan for direct dependencies and their children
+            const updatePlan = identifyUpdatePlan(treeJsonWithChildren);
+            core.info(`Update Plan:`);
+            core.info(`${JSON.stringify(updatePlan, null, 2)}`);
             // Testing - Print out pull requests
             const pullRequests = yield listPullRequests(repo, githubToken);
             //console.log(pullRequests)
@@ -36418,7 +36422,7 @@ function associateAlerts(dependencyTree, alerts) {
     }
     return associatedPackages;
 }
-function identifyIndirectUpdates(dependencyTree) {
+function mapChildrenToParents(dependencyTree) {
     const childrenMap = {};
     // Map first level of children to their parents
     for (const pkg of dependencyTree) {
@@ -36444,12 +36448,12 @@ function identifyIndirectUpdates(dependencyTree) {
         hasChildren = false;
         loopCount++;
         console.log(`Loop count: ${loopCount}`);
-        if (loopCount > 5) {
-            console.log('Exceeded 5 iterations building dependency tree, exiting loop.');
+        if (loopCount > 10) {
+            console.log('Exceeded 10 iterations building dependency tree, exiting loop.');
             break;
         }
         for (const parentKey in childrenMap) {
-            console.log(`Parent key: ${parentKey}`);
+            //console.log(`Parent key: ${parentKey}`);
             // For each child of a parent, check if it has children
             for (const child of childrenMap[parentKey]) {
                 const childKey = `${child.type}:${child.namespace}:${child.name}:${child.version}`;
@@ -36464,12 +36468,7 @@ function identifyIndirectUpdates(dependencyTree) {
                             delete existingChildNoDepth.depth;
                             return JSON.stringify(existingChildNoDepth) === JSON.stringify(child2NoDepth);
                         });
-                        //const childExists = childrenMap[parentKey].some((existingChild: any) => {
-                        //  const existingChildKey = `${existingChild.type}:${existingChild.namespace}:${existingChild.name}:${existingChild.version}`;
-                        //  console.log(`Existing Child key: ${existingChildKey}, Child key: ${childKey}`);
-                        //  return existingChildKey === childKey;
-                        //});
-                        console.log(`Child exists: ${childExists}`);
+                        //console.log(`Child exists: ${childExists}`);
                         // If child does not exist in childrenMap[parentKey], add it
                         if (!childExists) {
                             childrenMap[parentKey].push(Object.assign(Object.assign({}, child2), { depth: child2.depth + 1 }));
@@ -36480,7 +36479,7 @@ function identifyIndirectUpdates(dependencyTree) {
             }
         }
     }
-    console.log('childrenMap: ', childrenMap);
+    //console.log('childrenMap: ', childrenMap);
     // Add children to parent packages
     const result = [];
     for (const pkg of dependencyTree) {
@@ -36492,6 +36491,67 @@ function identifyIndirectUpdates(dependencyTree) {
         result.push(pkg);
     }
     return result;
+}
+function identifyUpdatePlan(dependencyTree) {
+    const alerts = [];
+    for (const pkg of dependencyTree) {
+        //const alerts: any[] = [];
+        // If it is a direct dependency we can address alerts on it
+        if (pkg.relationship === 'direct') {
+            // If the package has alerts, add to the alerts array
+            if (pkg.alerts.length > 0) {
+                alerts.push(Object.assign(Object.assign({}, pkg), { depth: 0 }));
+            }
+            // Check if the package has children with alerts
+            for (const child of pkg.children) {
+                if (child.alerts.length > 0) {
+                    // If the child has alerts, add to the alerts array
+                    alerts.push(child);
+                    // Check if the parent package is already in the alerts array
+                    const parentInAlerts = alerts.some(alert => alert.name === pkg.name);
+                    // If the parent package is not in the alerts array, add it
+                    if (!parentInAlerts) {
+                        alerts.push(pkg);
+                    }
+                }
+            }
+            // If there are alerts, we need to build update plan for the direct dependency
+            if (alerts.length > 0) {
+                // Sort alerts by depth in descending order
+                alerts.sort((a, b) => b.depth - a.depth);
+                // Group alerts by depth
+                const alertsByDepth = alerts.reduce((groups, alert) => {
+                    if (!groups[alert.depth]) {
+                        groups[alert.depth] = [];
+                    }
+                    groups[alert.depth].push(alert);
+                    return groups;
+                }, {});
+                // Get the depths in descending order
+                const depths = Object.keys(alertsByDepth).sort((a, b) => Number(b) - Number(a));
+                // Iterate over each depth
+                for (const depth of depths) {
+                    const alertsAtDepth = alertsByDepth[depth];
+                    core.info(`Processing alerts at depth ${depth}: ${JSON.stringify(alertsAtDepth)}`);
+                    // Iterate over each alert at this depth
+                    for (const alert of alertsAtDepth) {
+                        // If the alert is the package itself, we can update the package
+                        if (alert.depth === 0) {
+                            // TODO: Add some logic to determine the update version
+                            pkg.update = true;
+                        }
+                        else {
+                            // If the alert is a child, we need to identify the update for the parent first
+                            const childToUpdate = pkg.children.find((child) => child.name === alert.name);
+                            console.info(`Child to update: ${JSON.stringify(childToUpdate)}`);
+                            childToUpdate.update = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return alerts;
 }
 //TODO - Update this to allow for a specific version?
 // TODO - Update this to allow a different package manager
