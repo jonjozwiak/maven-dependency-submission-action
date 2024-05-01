@@ -36493,9 +36493,9 @@ function mapChildrenToParents(dependencyTree) {
     return result;
 }
 function identifyUpdatePlan(dependencyTree) {
-    const alerts = [];
+    const plan = [];
     for (const pkg of dependencyTree) {
-        //const alerts: any[] = [];
+        const alerts = [];
         // If it is a direct dependency we can address alerts on it
         if (pkg.relationship === 'direct') {
             // If the package has alerts, add to the alerts array
@@ -36554,10 +36554,13 @@ function identifyUpdatePlan(dependencyTree) {
                         }
                     }
                 }
+                // Capture alerts to results
+                plan.push(alerts);
             }
         }
     }
-    return alerts;
+    console.log('Alert Update plan: ', plan);
+    return plan;
 }
 //TODO - Update this to allow for a specific version?
 // TODO - Update this to allow a different package manager

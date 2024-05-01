@@ -431,10 +431,10 @@ function mapChildrenToParents(dependencyTree: any[]): any[] {
 }
 
 function identifyUpdatePlan(dependencyTree: any[]): any[] {
-  const alerts: any[] = [];
+  const plan: any[] = [];
 
   for (const pkg of dependencyTree) {
-    //const alerts: any[] = [];
+    const alerts: any[] = [];
 
     // If it is a direct dependency we can address alerts on it
     if (pkg.relationship === 'direct') {
@@ -506,14 +506,15 @@ function identifyUpdatePlan(dependencyTree: any[]): any[] {
             }
           }
         }
+
+        // Capture alerts to results
+        plan.push(alerts);
       }
-
-
     }
   }
 
-
-  return alerts;
+  console.log('Alert Update plan: ', plan);
+  return plan;
 }
 
 //TODO - Update this to allow for a specific version?
