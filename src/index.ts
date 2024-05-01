@@ -489,13 +489,15 @@ function identifyUpdatePlan(dependencyTree: any[]): any[] {
           // Iterate over each alert at this depth
           for (const alert of alertsAtDepth) {
             // If the alert is the package itself, we can update the package
+            console.info(`Processing package: ${alert.namespace}:${alert.name}:${alert.version}`);
             if (alert.depth === 0) {
               // TODO: Add some logic to determine the update version
               pkg.update = true;
+              console.info(`  - Depth 0 update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
             } else {
               // If the alert is a child, we need to identify the update for the parent first
-              console.info(`Child to update: ${alert.namespace}:${alert.name}:${alert.version} -- To Version: ${alert.patched_version}`);
-              console.info(`Parent to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
+              console.info(`  - Child to update: ${alert.namespace}:${alert.name}:${alert.version} -- To Version: ${alert.patched_version}`);
+              console.info(`  - Parent to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
             }
           }
         }
