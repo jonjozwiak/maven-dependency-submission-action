@@ -141,13 +141,13 @@ async function run() {
     // Add children to their parents for easier processing
     const treeJsonWithChildren = mapChildrenToParents(treeJsonWithDependabot);
 
-    core.info(`Tree with Dependabot Alerts and Children:`)
-    core.info(`${JSON.stringify(treeJsonWithChildren, null, 2)}`);
+    //core.info(`Tree with Dependabot Alerts and Children:`)
+    //core.info(`${JSON.stringify(treeJsonWithChildren, null, 2)}`);
 
     // Identify update plan for direct dependencies and their children
     const updatePlan = identifyUpdatePlan(treeJsonWithChildren);
-    core.info(`Update Plan:`)
-    core.info(`${JSON.stringify(updatePlan, null, 2)}`);
+    //core.info(`Update Plan:`)
+    //core.info(`${JSON.stringify(updatePlan, null, 2)}`);
 
     // Testing - Print out pull requests
     const pullRequests = await listPullRequests(repo, githubToken)
@@ -369,7 +369,7 @@ function mapChildrenToParents(dependencyTree: any[]): any[] {
     hasChildren = false;
     loopCount++;
 
-    console.log(`Loop count: ${loopCount}`);
+    //console.log(`Loop count: ${loopCount}`);
 
     if (loopCount > 10) {
       console.log('Exceeded 10 iterations building dependency tree, exiting loop.');
