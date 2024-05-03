@@ -609,6 +609,8 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
       }
     }
 
+    console.log('result: ', result);
+    
     // Extract the dependencies
     const dependencies = result.project.dependencies[0].dependency.map((dep: any) => {
       const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
