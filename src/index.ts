@@ -521,21 +521,23 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               let allVersions = await getAllVersionsFromMaven(alert.parent.namespace, alert.parent.name);
               console.log(allVersions);
 
-              allVersions = allVersions.filter(version => {
-                // Check if the version is a pre-release version
-                let isPreRelease = semver.prerelease(version) !== null  || version.includes('M') || version.includes('RC') || version.includes('CR') || version.includes('v');
-                return !isPreRelease;
-              });
-              console.log("allVersion No prerelease", allVersions);
+              //allVersions = allVersions.filter(version => {
+              //  // Check if the version is a pre-release version
+              //  let isPreRelease = semver.prerelease(version) !== null  || version.includes('M') || version.includes('RC') || version.includes('CR') || version.includes('v');
+              //  return !isPreRelease;
+              //});
+
 
               // Filter out versions that contain non-release qualifiers
-              //let qualifiers = ['alpha', 'beta', 'milestone', 'rc', 'cr', 'snapshot'];
+              let qualifiers = ['alpha', 'beta', 'milestone', 'm', 'rc', 'cr', 'snapshot', 'v'];
 
-              //allVersions = allVersions.filter(version => {
-              //  // Check if the version string contains any of the qualifiers
-              //  let containsQualifier = qualifiers.some(qualifier => version.includes(qualifier));
-              //  return !containsQualifier;
-              //});
+              allVersions = allVersions.filter(version => {
+                // Check if the version string contains any of the qualifiers
+                let containsQualifier = qualifiers.some(qualifier => version.toLowerCase().includes(qualifier));
+                return !containsQualifier;
+              });
+
+              console.log("allVersion No prerelease", allVersions);
 
               // Filter allVersions to only include minor releases of the current major version
               let majorVersion = semver.major(alert.parent.version);
