@@ -547,8 +547,8 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               // Sort allVersions in ascending order using semver
               allVersions.sort(semver.compare);
               let versionIndex = allVersions.indexOf(alert.parent.version);
-              console.log('Version Index: ', versionIndex);
-              console.log('Alert Parent Version: ', alert.parent.version);
+              //console.log('Version Index: ', versionIndex);
+              //console.log('Alert Parent Version: ', alert.parent.version);
 
               // Start with patched_version if the parent has a planned patch
               if (alert.parent.patched_version) {
@@ -561,8 +561,8 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
                 }
               }
 
-              console.log('Version Index: ', versionIndex);
-              console.log('Alert Parent PAtched Version: ', alert.parent.patched_version);
+              //console.log('Version Index: ', versionIndex);
+              //console.log('Alert Parent PAtched Version: ', alert.parent.patched_version);
 
               // While there are more versions and childDependency.version !== target_patched_version
               while (versionIndex < allVersions.length && (!childDependency || !semver.gte(childDependency.version, alert.patched_version))) {
@@ -637,7 +637,6 @@ async function getParentDependencyVersions(groupId: string, artifactId: string, 
     const properties = result.project.properties ? result.project.properties[0] : {};
 
     if (result.project.version) {
-      console.log('URL and project version: ', url, result.project.version);
       properties['project.version'] = result.project.version[0];
     }
 
@@ -659,7 +658,6 @@ async function getParentDependencyVersions(groupId: string, artifactId: string, 
 
         // Replace version variable with actual value from properties
         const versionVariableMatch = version.match(/\$\{(.+)\}/);
-        console.log(`dep.version[0]: ${dep.version[0]}`);
         if (versionVariableMatch) {
           const versionVariable = versionVariableMatch[1];
           if (versionVariable === 'project.version') {
@@ -667,16 +665,8 @@ async function getParentDependencyVersions(groupId: string, artifactId: string, 
           } else if (properties[versionVariable]) {
             version = properties[versionVariable][0];
           }
-          //if (properties[versionVariable]) {
-          //  console.log(`properties[${versionVariable}][0]: ${properties[versionVariable][0]}`);
-          //  version = properties[versionVariable][0];
-         // }
-          // If project.version is used, replace it with the parent version
-          //if (versionVariable === 'project.version') {
-          //  version = result.project.version[0];
-          //}
         }
-        console.log(`Final version: ${version}`);
+
 
         parentDependencyVersions[key] = version;
       }
