@@ -51520,7 +51520,6 @@ function getDependenciesForMavenPackage(packageNamespace, packageName, version) 
                     parentDependencyVersions = yield getParentDependencyVersions(parentGroupId, parentArtifactId, parentVersion);
                 }
             }
-            console.log('result: ', result);
             // Extract the dependencies
             const dependencies = result.project.dependencies[0].dependency.map((dep) => {
                 const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
