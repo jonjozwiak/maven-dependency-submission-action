@@ -521,6 +521,22 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               let allVersions = await getAllVersionsFromMaven(alert.parent.namespace, alert.parent.name);
               console.log(allVersions);
 
+              allVersions = allVersions.filter(version => {
+                // Check if the version is a pre-release version
+                let isPreRelease = semver.prerelease(version) !== null;
+                return !isPreRelease;
+              });
+              console.log("allVersion No prerelease", allVersions);
+
+              // Filter out versions that contain non-release qualifiers
+              //let qualifiers = ['alpha', 'beta', 'milestone', 'rc', 'cr', 'snapshot'];
+
+              //allVersions = allVersions.filter(version => {
+              //  // Check if the version string contains any of the qualifiers
+              //  let containsQualifier = qualifiers.some(qualifier => version.includes(qualifier));
+              //  return !containsQualifier;
+              //});
+
               // Filter allVersions to only include minor releases of the current major version
               let majorVersion = semver.major(alert.parent.version);
               allVersions = allVersions.filter(version => semver.major(version) === majorVersion);
@@ -552,7 +568,7 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
                   console.log(`Setting parent patched version to ${currentVersion}`);
                   alert.parent.patched_version = currentVersion;
                 }
-                
+
                 // Move to the next version
                 versionIndex++;
               }
