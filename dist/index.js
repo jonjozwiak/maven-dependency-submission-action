@@ -51391,6 +51391,8 @@ function getParentDependencyVersions(groupId, artifactId, version) {
         try {
             const response = yield lib_axios.get(url);
             const result = yield xml2js.parseStringPromise(response.data);
+            // Extract properties from the POM file
+            const properties = result.project.properties ? result.project.properties[0] : {};
             let parentDependencyVersions = {};
             if (result.project.parent) {
                 const parentGroupId = result.project.parent[0].groupId[0];
@@ -51403,7 +51405,16 @@ function getParentDependencyVersions(groupId, artifactId, version) {
             if (result.project.dependencyManagement) {
                 for (const dep of result.project.dependencyManagement[0].dependencies[0].dependency) {
                     const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
-                    parentDependencyVersions[key] = dep.version[0];
+                    let version = dep.version[0];
+                    // Replace version variable with actual value from properties
+                    const versionVariableMatch = version.match(/\$\{(.+)\}/);
+                    if (versionVariableMatch) {
+                        const versionVariable = versionVariableMatch[1];
+                        if (properties[versionVariable]) {
+                            version = properties[versionVariable][0];
+                        }
+                    }
+                    parentDependencyVersions[key] = version;
                 }
             }
             return parentDependencyVersions;
