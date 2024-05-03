@@ -51356,6 +51356,7 @@ function identifyUpdatePlan(dependencyTree) {
                                 console.info(`  - Child to update: ${alert.namespace}:${alert.name}:${alert.version} -- To Version: ${alert.patched_version}`);
                                 console.info(`  - Parent to update: ${alert.parent.namespace}:${alert.parent.name}:${alert.parent.version}` + (alert.parent.patched_version ? ` -- To Version: ${alert.parent.patched_version}` : ''));
                                 console.info(`  - Direct Dependency to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
+                                console.log('Alert parent: ', alert.parent);
                                 // We have now found the child and it's immediate parent as well as direct dependency we can update
                                 // Next, we need to reach out to maven to find which alert.parent.version includes our alert.patched_version
                                 // Once we identify that we should compare alert.parent.patched_version to the version we found
