@@ -51387,10 +51387,14 @@ function identifyUpdatePlan(dependencyTree) {
                                 // Sort allVersions in ascending order using semver
                                 allVersions.sort(semver.compare);
                                 let versionIndex = allVersions.indexOf(alert.parent.version);
+                                console.log('Version Index: ', versionIndex);
+                                console.log('Alert Parent Version: ', alert.parent.version);
                                 // Start with patched_version if the parent has a planned patch
                                 if (alert.parent.patched_version) {
                                     versionIndex = allVersions.indexOf(alert.parent.patched_version);
                                 }
+                                console.log('Version Index: ', versionIndex);
+                                console.log('Alert Parent PAtched Version: ', alert.parent.patched_version);
                                 // While there are more versions and childDependency.version !== target_patched_version
                                 while (versionIndex < allVersions.length && (!childDependency || !semver.gte(childDependency.version, alert.patched_version))) {
                                     let currentVersion = allVersions[versionIndex];
