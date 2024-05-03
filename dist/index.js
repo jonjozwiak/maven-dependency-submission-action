@@ -51420,10 +51420,20 @@ function identifyUpdatePlan(dependencyTree) {
                                         console.log("Package: ", pkg);
                                         console.log("Alert: ", alert);
                                         console.log("Alert Parent: ", alert.parent);
-                                        if (pkg.namespace === alert.namespace && pkg.name === alert.name) {
-                                            console.log(`Setting alert patched version to ${currentVersion}`);
-                                            alert.patched_version = currentVersion;
-                                        }
+                                        // Update parent in the alerts array for new patched version
+                                        alerts.forEach(a => {
+                                            if (a.namespace === alert.parent.namespace && a.name === alert.parent.name) {
+                                                a.patched_version = currentVersion;
+                                            }
+                                        });
+                                        //if (pkg.namespace === alert.namespace && pkg.name === alert.name) {
+                                        //  console.log(`Setting alert patched version to ${currentVersion}`);
+                                        //  alert.patched_version = currentVersion;
+                                        //  const alertInAlerts = alerts.find(a => a.namespace === alert.namespace && a.name === alert.name);
+                                        //  if (alertInAlerts) {
+                                        //    alertInAlerts.patched_version = currentVersion;
+                                        //  }
+                                        //}
                                     }
                                     // Move to the next version
                                     versionIndex++;
