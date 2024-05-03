@@ -523,7 +523,7 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
 
               allVersions = allVersions.filter(version => {
                 // Check if the version is a pre-release version
-                let isPreRelease = semver.prerelease(version) !== null;
+                let isPreRelease = semver.prerelease(version) !== null  || version.includes('M') || version.includes('RC') || version.includes('CR');
                 return !isPreRelease;
               });
               console.log("allVersion No prerelease", allVersions);
