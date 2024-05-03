@@ -536,6 +536,7 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
   return plan;
 }
 
+// TODO - Update url to be able to pull from local maven repository as defined in pom.xml for the project
 async function getDependenciesForMavenPackage(packageNamespace: string, packageName: string, version: string) {
   const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
 
@@ -544,7 +545,7 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
     console.log('Maven POM response: ', response);
 
     const result = await xml2js.parseStringPromise(response.data);
-    console.log('Maven POM result: ', result);
+    console.log('Maven POM result: ', JSON.stringify(result, null, 2));
 
     // Extract the dependencies
     /*

@@ -51382,6 +51382,7 @@ function identifyUpdatePlan(dependencyTree) {
         return plan;
     });
 }
+// TODO - Update url to be able to pull from local maven repository as defined in pom.xml for the project
 function getDependenciesForMavenPackage(packageNamespace, packageName, version) {
     return src_awaiter(this, void 0, void 0, function* () {
         const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
@@ -51389,7 +51390,7 @@ function getDependenciesForMavenPackage(packageNamespace, packageName, version) 
             const response = yield lib_axios.get(url);
             console.log('Maven POM response: ', response);
             const result = yield xml2js.parseStringPromise(response.data);
-            console.log('Maven POM result: ', result);
+            console.log('Maven POM result: ', JSON.stringify(result, null, 2));
             // Extract the dependencies
             /*
             const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
