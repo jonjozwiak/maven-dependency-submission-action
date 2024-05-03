@@ -51393,6 +51393,9 @@ function getParentDependencyVersions(groupId, artifactId, version) {
             const result = yield xml2js.parseStringPromise(response.data);
             // Extract properties from the POM file
             const properties = result.project.properties ? result.project.properties[0] : {};
+            if (result.project.version) {
+                properties['project.version'] = result.project.version[0];
+            }
             let parentDependencyVersions = {};
             if (result.project.parent) {
                 const parentGroupId = result.project.parent[0].groupId[0];
@@ -51450,8 +51453,7 @@ function getDependenciesForMavenPackage(packageNamespace, packageName, version) 
             // Extract the dependencies
             const dependencies = result.project.dependencies[0].dependency.map((dep) => {
                 const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
-                //const version = dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : parentDependencyVersions[key];
-                const version = dep.version ? (dep.version[0] === '${project.version}' ? result.project.version[0] : dep.version[0]) : parentDependencyVersions[key];
+                const version = dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : parentDependencyVersions[key];
                 return {
                     groupId: dep.groupId[0],
                     artifactId: dep.artifactId[0],
