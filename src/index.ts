@@ -704,14 +704,7 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
     // Extract the dependencies
     const dependencies = result.project.dependencies[0].dependency.map((dep: any) => {
       const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
-
-      console.log(`dep.version[0]: ${dep.version ? dep.version[0] : 'undefined'}`);
-      console.log(`parentVersion: ${parentVersion}`);
-      console.log(`parentDependencyVersions[key]: ${parentDependencyVersions[key]}`);
-
       const version = dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : parentDependencyVersions[key];
-
-      console.log(`Final version: ${version}`);
 
       return {
         groupId: dep.groupId[0],
