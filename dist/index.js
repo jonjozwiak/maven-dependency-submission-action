@@ -51366,8 +51366,10 @@ function identifyUpdatePlan(dependencyTree) {
                                 const parentDependencies = yield getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, alert.parent.version);
                                 console.log('Parent dependencies: ', parentDependencies);
                                 // Find the dependency that matches the child
-                                const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
-                                console.log('Child dependency: ', childDependency);
+                                if (parentDependencies) {
+                                    const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
+                                    console.log('Child dependency: ', childDependency);
+                                }
                             }
                         }
                     }
@@ -51385,13 +51387,16 @@ function getDependenciesForMavenPackage(packageNamespace, packageName, version) 
         const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
         try {
             const response = yield lib_axios.get(url);
+            console.log('Maven POM response: ', response);
             const result = yield xml2js.parseStringPromise(response.data);
+            console.log('Maven POM result: ', result);
             // Extract the dependencies
             const dependencies = result.project.dependencies[0].dependency.map((dep) => ({
                 groupId: dep.groupId[0],
                 artifactId: dep.artifactId[0],
                 version: dep.version[0],
             }));
+            console.log('Dependencies: ', dependencies);
             return dependencies;
         }
         catch (error) {

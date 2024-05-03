@@ -518,9 +518,10 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               console.log('Parent dependencies: ', parentDependencies);
 
               // Find the dependency that matches the child
-              const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
-              console.log('Child dependency: ', childDependency);
-
+              if (parentDependencies) {
+                const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
+                console.log('Child dependency: ', childDependency);
+              }
             }
           }
         }
@@ -540,7 +541,10 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
 
   try {
     const response = await axios.get(url);
+    console.log('Maven POM response: ', response);
+
     const result = await xml2js.parseStringPromise(response.data);
+    console.log('Maven POM result: ', result);
 
     // Extract the dependencies
     const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
@@ -548,6 +552,8 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
       artifactId: dep.artifactId[0],
       version: dep.version[0],
     }));
+
+    console.log('Dependencies: ', dependencies);
 
     return dependencies;
   } catch (error) {
