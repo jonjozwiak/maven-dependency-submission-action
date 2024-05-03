@@ -662,10 +662,15 @@ async function getParentDependencyVersions(groupId: string, artifactId: string, 
         console.log(`dep.version[0]: ${dep.version[0]}`);
         if (versionVariableMatch) {
           const versionVariable = versionVariableMatch[1];
-          if (properties[versionVariable]) {
-            console.log(`properties[${versionVariable}][0]: ${properties[versionVariable][0]}`);
+          if (versionVariable === 'project.version') {
+            version = result.project.version[0];
+          } else if (properties[versionVariable]) {
             version = properties[versionVariable][0];
           }
+          //if (properties[versionVariable]) {
+          //  console.log(`properties[${versionVariable}][0]: ${properties[versionVariable][0]}`);
+          //  version = properties[versionVariable][0];
+         // }
           // If project.version is used, replace it with the parent version
           //if (versionVariable === 'project.version') {
           //  version = result.project.version[0];
