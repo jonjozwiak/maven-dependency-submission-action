@@ -51417,8 +51417,9 @@ function identifyUpdatePlan(dependencyTree) {
                                         console.log(`Found child dependency version ${childDependency.version} that is greater than or equal to the target patched version ${alert.patched_version}`);
                                         console.log(`Setting parent patched version to ${currentVersion}`);
                                         alert.parent.patched_version = currentVersion;
-                                        if (pkg.namespace === alert.parent.namespace && pkg.name === alert.parent.name) {
-                                            pkg.patched_version = currentVersion;
+                                        if (pkg.namespace === alert.namespace && pkg.name === alert.name) {
+                                            console.log(`Setting alert patched version to ${currentVersion}`);
+                                            alert.patched_version = currentVersion;
                                         }
                                     }
                                     // Move to the next version
