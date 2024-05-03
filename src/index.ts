@@ -547,11 +547,20 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
     console.log('Maven POM result: ', result);
 
     // Extract the dependencies
+    /*
     const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
       groupId: dep.groupId[0],
       artifactId: dep.artifactId[0],
       version: dep.version[0],
     }));
+    */
+    const dependencies = result.project.dependencies && result.project.dependencies[0] && result.project.dependencies[0].dependency
+    ? result.project.dependencies[0].dependency.map((dep: any) => ({
+        groupId: dep.groupId[0],
+        artifactId: dep.artifactId[0],
+        version: dep.version[0],
+      }))
+    : [];
 
     console.log('Dependencies: ', dependencies);
 
