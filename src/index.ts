@@ -537,6 +537,78 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
 }
 
 // TODO - Update url to be able to pull from local maven repository as defined in pom.xml for the project
+// TODO - Add retries and expontential backoff
+// TODO - Add error handling
+async function getParentDependencyVersions(groupId: string, artifactId: string, version: string) {
+  const url = `https://repo.maven.apache.org/maven2/${groupId.replace(/\./g, '/')}/${artifactId}/${version}/${artifactId}-${version}.pom`;
+
+  try {
+    const response = await axios.get(url);
+    const result = await xml2js.parseStringPromise(response.data);
+
+    let parentDependencyVersions = {};
+    if (result.project.parent) {
+      const parentGroupId = result.project.parent[0].groupId[0];
+      const parentArtifactId = result.project.parent[0].artifactId[0];
+      const parentVersion = result.project.parent[0].version[0];
+
+      // Recursively get dependency versions from the parent POM
+      parentDependencyVersions = await getParentDependencyVersions(parentGroupId, parentArtifactId, parentVersion);
+    }
+
+    // Extract the dependency versions from the <dependencyManagement> section
+    if (result.project.dependencyManagement) {
+      for (const dep of result.project.dependencyManagement[0].dependencies[0].dependency) {
+        const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
+        parentDependencyVersions[key] = dep.version[0];
+      }
+    }
+
+    return parentDependencyVersions;
+  } catch (error) {
+    console.error(`Failed to fetch Maven POM file: ${error}`);
+    return {};
+  }
+}
+
+async function getDependenciesForMavenPackage(packageNamespace: string, packageName: string, version: string) {
+  const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
+
+  try {
+    const response = await axios.get(url);
+    const result = await xml2js.parseStringPromise(response.data);
+
+    let parentDependencyVersions = {};
+    let parentVersion = null;
+    if (result.project.parent) {
+      const parentGroupId = result.project.parent[0].groupId[0];
+      const parentArtifactId = result.project.parent[0].artifactId[0];
+      parentVersion = result.project.parent[0].version[0];
+
+      // Get dependency versions from the parent POM
+      if (parentVersion) {
+        parentDependencyVersions = await getParentDependencyVersions(parentGroupId, parentArtifactId, parentVersion);
+      }
+    }
+
+    // Extract the dependencies
+    const dependencies = result.project.dependencies[0].dependency.map((dep: any) => {
+      const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
+      const version = dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : parentDependencyVersions[key];
+      return {
+        groupId: dep.groupId[0],
+        artifactId: dep.artifactId[0],
+        version: version,
+      };
+    });
+
+    return dependencies;
+  } catch (error) {
+    console.error(`Failed to fetch Maven POM file: ${error}`);
+    return null;
+  }
+}
+/*
 async function getDependenciesForMavenPackage(packageNamespace: string, packageName: string, version: string) {
   const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
 
@@ -547,18 +619,14 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
     const result = await xml2js.parseStringPromise(response.data);
     console.log('Maven POM result: ', JSON.stringify(result, null, 2));
 
+    const parentVersion = result.project.parent[0].version[0];
+
     // Extract the dependencies
-    /*
+
     const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
       groupId: dep.groupId[0],
       artifactId: dep.artifactId[0],
-      version: dep.version[0],
-    }));
-    */
-    const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
-      groupId: dep.groupId[0],
-      artifactId: dep.artifactId[0],
-      version: dep.version ? dep.version[0] : null,  // Some dependencies might not have a version
+      version: dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : null,  // Some dependencies might not have a version
     }));
 
     console.log('Dependencies: ', dependencies);
@@ -569,6 +637,8 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
     return null;
   }
 }
+
+*/
 
 
 

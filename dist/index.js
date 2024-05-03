@@ -51383,28 +51383,64 @@ function identifyUpdatePlan(dependencyTree) {
     });
 }
 // TODO - Update url to be able to pull from local maven repository as defined in pom.xml for the project
+// TODO - Add retries and expontential backoff
+// TODO - Add error handling
+function getParentDependencyVersions(groupId, artifactId, version) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const url = `https://repo.maven.apache.org/maven2/${groupId.replace(/\./g, '/')}/${artifactId}/${version}/${artifactId}-${version}.pom`;
+        try {
+            const response = yield lib_axios.get(url);
+            const result = yield xml2js.parseStringPromise(response.data);
+            let parentDependencyVersions = {};
+            if (result.project.parent) {
+                const parentGroupId = result.project.parent[0].groupId[0];
+                const parentArtifactId = result.project.parent[0].artifactId[0];
+                const parentVersion = result.project.parent[0].version[0];
+                // Recursively get dependency versions from the parent POM
+                parentDependencyVersions = yield getParentDependencyVersions(parentGroupId, parentArtifactId, parentVersion);
+            }
+            // Extract the dependency versions from the <dependencyManagement> section
+            if (result.project.dependencyManagement) {
+                for (const dep of result.project.dependencyManagement[0].dependencies[0].dependency) {
+                    const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
+                    parentDependencyVersions[key] = dep.version[0];
+                }
+            }
+            return parentDependencyVersions;
+        }
+        catch (error) {
+            console.error(`Failed to fetch Maven POM file: ${error}`);
+            return {};
+        }
+    });
+}
 function getDependenciesForMavenPackage(packageNamespace, packageName, version) {
     return src_awaiter(this, void 0, void 0, function* () {
         const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
         try {
             const response = yield lib_axios.get(url);
-            console.log('Maven POM response: ', response);
             const result = yield xml2js.parseStringPromise(response.data);
-            console.log('Maven POM result: ', JSON.stringify(result, null, 2));
+            let parentDependencyVersions = {};
+            let parentVersion = null;
+            if (result.project.parent) {
+                const parentGroupId = result.project.parent[0].groupId[0];
+                const parentArtifactId = result.project.parent[0].artifactId[0];
+                parentVersion = result.project.parent[0].version[0];
+                // Get dependency versions from the parent POM
+                if (parentVersion) {
+                    parentDependencyVersions = yield getParentDependencyVersions(parentGroupId, parentArtifactId, parentVersion);
+                }
+            }
             // Extract the dependencies
-            /*
-            const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
-              groupId: dep.groupId[0],
-              artifactId: dep.artifactId[0],
-              version: dep.version[0],
-            }));
-            */
-            const dependencies = result.project.dependencies[0].dependency.map((dep) => ({
-                groupId: dep.groupId[0],
-                artifactId: dep.artifactId[0],
-                version: dep.version ? dep.version[0] : null, // Some dependencies might not have a version
-            }));
-            console.log('Dependencies: ', dependencies);
+            const dependencies = result.project.dependencies[0].dependency.map((dep) => {
+                const key = `${dep.groupId[0]}:${dep.artifactId[0]}`;
+                const version = dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : parentDependencyVersions[key];
+                return {
+                    groupId: dep.groupId[0],
+                    artifactId: dep.artifactId[0],
+                    version: version,
+                };
+            });
             return dependencies;
         }
         catch (error) {
@@ -51413,6 +51449,37 @@ function getDependenciesForMavenPackage(packageNamespace, packageName, version) 
         }
     });
 }
+/*
+async function getDependenciesForMavenPackage(packageNamespace: string, packageName: string, version: string) {
+  const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
+
+  try {
+    const response = await axios.get(url);
+    console.log('Maven POM response: ', response);
+
+    const result = await xml2js.parseStringPromise(response.data);
+    console.log('Maven POM result: ', JSON.stringify(result, null, 2));
+
+    const parentVersion = result.project.parent[0].version[0];
+
+    // Extract the dependencies
+
+    const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
+      groupId: dep.groupId[0],
+      artifactId: dep.artifactId[0],
+      version: dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : null,  // Some dependencies might not have a version
+    }));
+
+    console.log('Dependencies: ', dependencies);
+
+    return dependencies;
+  } catch (error) {
+    console.error(`Failed to fetch Maven POM file: ${error}`);
+    return null;
+  }
+}
+
+*/
 //TODO - Update this to allow for a specific version?
 // TODO - Update this to allow a different package manager
 //TODO - Update this to get a specific version? Or just use the latest?
