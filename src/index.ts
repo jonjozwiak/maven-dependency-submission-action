@@ -658,9 +658,11 @@ async function getParentDependencyVersions(groupId: string, artifactId: string, 
 
         // Replace version variable with actual value from properties
         const versionVariableMatch = version.match(/\$\{(.+)\}/);
+        console.log(`dep.version[0]: ${dep.version[0]}`);
         if (versionVariableMatch) {
           const versionVariable = versionVariableMatch[1];
           if (properties[versionVariable]) {
+            console.log(`properties[${versionVariable}][0]: ${properties[versionVariable][0]}`);
             version = properties[versionVariable][0];
           }
           // If project.version is used, replace it with the parent version
@@ -668,6 +670,7 @@ async function getParentDependencyVersions(groupId: string, artifactId: string, 
           //  version = result.project.version[0];
           //}
         }
+        console.log(`Final version: ${version}`);
 
         parentDependencyVersions[key] = version;
       }
@@ -713,7 +716,7 @@ async function getDependenciesForMavenPackage(packageNamespace: string, packageN
       const version = dep.version ? (dep.version[0] === '${project.version}' ? parentVersion : dep.version[0]) : parentDependencyVersions[key];
 
       console.log(`Final version: ${version}`);
-      
+
       return {
         groupId: dep.groupId[0],
         artifactId: dep.artifactId[0],
