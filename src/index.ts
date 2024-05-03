@@ -520,7 +520,7 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               let parentDependencies;
               let childDependency;
               let allVersions = await getAllVersionsFromMaven(alert.parent.namespace, alert.parent.name);
-              console.log(allVersions);
+              //console.log(allVersions);
 
               //allVersions = allVersions.filter(version => {
               //  // Check if the version is a pre-release version
@@ -553,6 +553,12 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               // Start with patched_version if the parent has a planned patch
               if (alert.parent.patched_version) {
                 versionIndex = allVersions.indexOf(alert.parent.patched_version);
+              } else {
+                // Check if the alert parent is the direct dependency.  If so, check for a parent version - a hacky workaround for the moment.. TODO - Fix this
+                   // The problem needing to be fixed is that alert.parent.patched_version is not being set
+                if (pkg.namespace === alert.parent.namespace && pkg.name === alert.parent.name && pkg.version === alert.parent.version && pkg.patched_version) {
+                  versionIndex = allVersions.indexOf(pkg.patched_version);
+                }
               }
 
               console.log('Version Index: ', versionIndex);
@@ -561,7 +567,7 @@ async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
               // While there are more versions and childDependency.version !== target_patched_version
               while (versionIndex < allVersions.length && (!childDependency || !semver.gte(childDependency.version, alert.patched_version))) {
                 let currentVersion = allVersions[versionIndex];
-
+                console.log('Current Version and Index: ', currentVersion, versionIndex);
                 parentDependencies = await getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, currentVersion);
                 console.log('Parent dependencies: ', parentDependencies);
 
