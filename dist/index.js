@@ -51370,7 +51370,7 @@ function identifyUpdatePlan(dependencyTree) {
                                 console.log(allVersions);
                                 allVersions = allVersions.filter(version => {
                                     // Check if the version is a pre-release version
-                                    let isPreRelease = semver.prerelease(version) !== null || version.includes('M') || version.includes('RC') || version.includes('CR');
+                                    let isPreRelease = semver.prerelease(version) !== null || version.includes('M') || version.includes('RC') || version.includes('CR') || version.includes('v');
                                     return !isPreRelease;
                                 });
                                 console.log("allVersion No prerelease", allVersions);
