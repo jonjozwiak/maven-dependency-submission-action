@@ -145,7 +145,7 @@ async function run() {
     //core.info(`${JSON.stringify(treeJsonWithChildren, null, 2)}`);
 
     // Identify update plan for direct dependencies and their children
-    const updatePlan = identifyUpdatePlan(treeJsonWithChildren);
+    const updatePlan = await identifyUpdatePlan(treeJsonWithChildren);
     //core.info(`Update Plan:`)
     //core.info(`${JSON.stringify(updatePlan, null, 2)}`);
 
@@ -430,7 +430,7 @@ function mapChildrenToParents(dependencyTree: any[]): any[] {
   return result;
 }
 
-function identifyUpdatePlan(dependencyTree: any[]): any[] {
+async function identifyUpdatePlan(dependencyTree: any[]): Promise<any[]> {
   const plan: any[] = [];
 
   for (const pkg of dependencyTree) {
@@ -496,20 +496,30 @@ function identifyUpdatePlan(dependencyTree: any[]): any[] {
             // If the alert is the package itself, we can update the package
             console.info(`Processing package: ${alert.namespace}:${alert.name}:${alert.version}`);
             if (alert.depth === 0) {
-              // TODO - Step 2 - Have this compare the child_patched_version to patched_version (and use the newer of the two)
+              // TODO - Step 2 - Have this compare the child_patched_version (if it exists) to patched_version (and use the newer of the two)
               console.info(`  - Depth 0 update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
             } else {
               // If the alert is a child, we need to identify the update for the parent first
+              // Eventually this gets to the direct dependency we can actually update taking into account
+              // version needs for the transitive dependencies
               console.info(`  - Child to update: ${alert.namespace}:${alert.name}:${alert.version} -- To Version: ${alert.patched_version}`);
               console.info(`  - Parent to update: ${alert.parent.namespace}:${alert.parent.name}:${alert.parent.version}` + (alert.parent.patched_version ? ` -- To Version: ${alert.parent.patched_version}` : ''));
               console.info(`  - Direct Dependency to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
 
-              // TODO - This isn't quite right.  This will find the depth 0 parent (ie direct dependency)
-              // It will not find the parent of the child (if we're at depth 2 or more)
-              // We need to find the parent of the child.  (i.e. alert.parent)
-              // Then we need to search for potential package updates and reach out to maven to find which parent version includes our child version
-                // Need to ensure retries and exponential backoff for the maven call
+              // We have now found the child and it's immediate parent as well as direct dependency we can update
+              // Next, we need to reach out to maven to find which alert.parent.version includes our alert.patched_version
+              // Once we idenify that we should compare alert.parent.patched_version to the version we found
+              // We should set child_patched_version on the parent to the version we found
+              // If there is not a patched version we should identify this by setting pkg.unpatched_child[] = alert
 
+              // TODO - Write this function as mentioned above...
+              //getMavenParentUpdate(alert);
+              const parentDependencies = await getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, alert.parent.version);
+              console.log('Parent dependencies: ', parentDependencies);
+
+              // Find the dependency that matches the child
+              const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
+              console.log('Child dependency: ', childDependency);
 
             }
           }
@@ -524,6 +534,29 @@ function identifyUpdatePlan(dependencyTree: any[]): any[] {
   console.log('Alert Update plan: ', plan);
   return plan;
 }
+
+async function getDependenciesForMavenPackage(packageNamespace: string, packageName: string, version: string) {
+  const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/${version}/${packageName}-${version}.pom`;
+
+  try {
+    const response = await axios.get(url);
+    const result = await xml2js.parseStringPromise(response.data);
+
+    // Extract the dependencies
+    const dependencies = result.project.dependencies[0].dependency.map((dep: any) => ({
+      groupId: dep.groupId[0],
+      artifactId: dep.artifactId[0],
+      version: dep.version[0],
+    }));
+
+    return dependencies;
+  } catch (error) {
+    console.error(`Failed to fetch Maven POM file: ${error}`);
+    return null;
+  }
+}
+
+
 
 //TODO - Update this to allow for a specific version?
 // TODO - Update this to allow a different package manager
