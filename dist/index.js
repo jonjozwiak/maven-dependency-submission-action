@@ -51467,6 +51467,7 @@ function getParentDependencyVersions(groupId, artifactId, version) {
             // Extract properties from the POM file
             const properties = result.project.properties ? result.project.properties[0] : {};
             if (result.project.version) {
+                console.log('URL and project version: ', url, result.project.version);
                 properties['project.version'] = result.project.version[0];
             }
             let parentDependencyVersions = {};
