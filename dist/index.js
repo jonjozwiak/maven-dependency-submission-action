@@ -51358,18 +51358,65 @@ function identifyUpdatePlan(dependencyTree) {
                                 console.info(`  - Direct Dependency to update: ${pkg.namespace}:${pkg.name}:${pkg.version}` + (pkg.patched_version ? ` -- To Version: ${pkg.patched_version}` : ''));
                                 // We have now found the child and it's immediate parent as well as direct dependency we can update
                                 // Next, we need to reach out to maven to find which alert.parent.version includes our alert.patched_version
-                                // Once we idenify that we should compare alert.parent.patched_version to the version we found
+                                // Once we identify that we should compare alert.parent.patched_version to the version we found
                                 // We should set child_patched_version on the parent to the version we found
                                 // If there is not a patched version we should identify this by setting pkg.unpatched_child[] = alert
                                 // TODO - Write this function as mentioned above...
                                 //getMavenParentUpdate(alert);
-                                const parentDependencies = yield getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, alert.parent.version);
-                                console.log('Parent dependencies: ', parentDependencies);
-                                // Find the dependency that matches the child
-                                if (parentDependencies) {
-                                    const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
-                                    console.log('Child dependency: ', childDependency);
+                                // If the parent has a patched version, pull its dependencies from maven
+                                let parentDependencies;
+                                let childDependency;
+                                let allVersions = yield getAllVersionsFromMaven(alert.parent.namespace, alert.parent.name);
+                                console.log(allVersions);
+                                // Filter allVersions to only include minor releases of the current major version
+                                let majorVersion = semver.major(alert.parent.version);
+                                allVersions = allVersions.filter(version => semver.major(version) === majorVersion);
+                                // Sort allVersions in ascending order using semver
+                                allVersions.sort(semver.compare);
+                                let versionIndex = allVersions.indexOf(alert.parent.version);
+                                // Start with patched_version if the parent has a planned patch
+                                if (alert.parent.patched_version) {
+                                    versionIndex = allVersions.indexOf(alert.parent.patched_version);
                                 }
+                                // While there are more versions and childDependency.version !== target_patched_version
+                                while (versionIndex < allVersions.length && (!childDependency || !semver.gte(childDependency.version, alert.patched_version))) {
+                                    let currentVersion = allVersions[versionIndex];
+                                    parentDependencies = yield getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, currentVersion);
+                                    console.log('Parent dependencies: ', parentDependencies);
+                                    if (parentDependencies) {
+                                        childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
+                                        console.log('Child dependency: ', childDependency);
+                                    }
+                                    if (semver.gte(childDependency.version, alert.patched_version)) {
+                                        // If the child dependency version is greater than or equal to the target patched version, we have found our match
+                                        console.log(`Found child dependency version ${childDependency.version} that is greater than or equal to the target patched version ${alert.patched_version}`);
+                                        console.log(`Setting parent patched version to ${currentVersion}`);
+                                        alert.parent.patched_version = currentVersion;
+                                    }
+                                    // Move to the next version
+                                    versionIndex++;
+                                }
+                                /*
+                                if (alert.parent.patched_version) {
+                                  parentDependencies = await getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, alert.parent.patched_version);
+                                  console.log('Parent dependencies: ', parentDependencies);
+                                } else {
+                                  // Pull the current parent version (as a base to compare against)
+                                  parentDependencies = await getDependenciesForMavenPackage(alert.parent.namespace, alert.parent.name, alert.parent.version);
+                                  console.log('Parent dependencies: ', parentDependencies);
+                                }
+                  
+                                // Find the dependency aligned to that parent in maven
+                                if (parentDependencies) {
+                                  const childDependency = parentDependencies.find(dep => dep.groupId === alert.namespace && dep.artifactId === alert.name);
+                                  console.log('Child dependency: ', childDependency);
+                  
+                                  // Check if the child dependency version is not equal to ${alert.patched_version} try the next greater parent version
+                                  if (childDependency.version !== alert.patched_version) {
+                  
+                                  }
+                                }
+                                */
                             }
                         }
                     }
@@ -51465,6 +51512,23 @@ function getDependenciesForMavenPackage(packageNamespace, packageName, version) 
         catch (error) {
             console.error(`Failed to fetch Maven POM file: ${error}`);
             return null;
+        }
+    });
+}
+function getAllVersionsFromMaven(packageNamespace, packageName, maxRetries = 3) {
+    return src_awaiter(this, void 0, void 0, function* () {
+        const url = `https://repo.maven.apache.org/maven2/${packageNamespace.replace(/\./g, '/')}/${packageName}/maven-metadata.xml`;
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = yield lib_axios.get(url);
+                const result = yield xml2js.parseStringPromise(response.data);
+                const versions = result.metadata.versioning[0].versions[0].version;
+                return versions;
+            }
+            catch (error) {
+                console.error(`Failed to fetch Maven metadata file: ${error}`);
+                return [];
+            }
         }
     });
 }
